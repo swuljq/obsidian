@@ -264,7 +264,9 @@ module.exports = class ImageResizeFixPlugin extends Plugin {
     }
 
     async persistWidth(image, width) {
-        const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+        const view = this.app.workspace.getLeavesOfType("markdown")
+            .map(leaf => leaf.view)
+            .find(candidate => candidate instanceof MarkdownView && candidate.containerEl.contains(image));
         if (!view || !view.file || !view.editor) {
             new Notice("Image Resize Fix：没有找到当前 Markdown 编辑器");
             return;
@@ -281,11 +283,20 @@ module.exports = class ImageResizeFixPlugin extends Plugin {
             return;
         }
 
-        editor.replaceRange(
-            match.replacement,
-            this.offsetToPosition(text, match.start),
-            this.offsetToPosition(text, match.end)
-        );
+        const scroller = image.closest(".cm-scroller, .markdown-preview-view");
+        const scrollTop = scroller?.scrollTop;
+        const scrollLeft = scroller?.scrollLeft;
+
+        // Obsidian's replaceRange always scrolls to the cursor, even when it is off-screen.
+        editor.cm.dispatch({
+            changes: { from: match.start, to: match.end, insert: match.replacement },
+            scrollIntoView: false,
+            userEvent: "input.image-resize"
+        });
+        if (scroller) {
+            scroller.scrollTop = scrollTop;
+            scroller.scrollLeft = scrollLeft;
+        }
     }
 
     getImageFileName(image) {
@@ -424,12 +435,4 @@ module.exports = class ImageResizeFixPlugin extends Plugin {
         return offset + pos.ch;
     }
 
-    offsetToPosition(text, offset) {
-        const before = text.slice(0, offset);
-        const lines = before.split("\n");
-        return {
-            line: lines.length - 1,
-            ch: lines[lines.length - 1].length
-        };
-    }
 };

@@ -8,6 +8,7 @@
 
 body {
     --hierarchy-list-indent: 2em;
+    --hierarchy-number-gap: 0.25em;
     --hierarchy-item-spacing: 0.18em;
     --hierarchy-line-height: 1.65;
 }
@@ -24,13 +25,17 @@ body {
 .markdown-rendered ol {
     list-style-type: decimal;
     list-style-position: outside;
-    padding-inline-start: var(--hierarchy-list-indent);
+    /* Obsidian indents LI elements; do not also indent their OL container. */
+    padding-inline-start: 0;
     margin-inline-start: 0;
 }
 
 :is(.markdown-reading-view, .markdown-source-view.mod-cm6) .markdown-rendered ol > li {
+    margin-inline-start: var(--hierarchy-list-indent);
     margin-top: var(--hierarchy-item-spacing) !important;
     margin-bottom: var(--hierarchy-item-spacing) !important;
+    padding-block: 0;
+    padding-inline-start: var(--hierarchy-number-gap);
     line-height: var(--hierarchy-line-height);
 }
 

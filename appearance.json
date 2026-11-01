@@ -4,13 +4,13 @@
   "monospaceFontFamily": "Cascadia Code",
   "enabledCssSnippets": [
     "table-style",
-    "code-style",
-    "better-table-style",
     "typography",
     "reading-layout",
+    "code-style",
     "list-hierarchy",
+    "content-style",
     "image-style",
-    "content-style"
+    "better-table-style"
   ],
   "showRibbon": true
 }

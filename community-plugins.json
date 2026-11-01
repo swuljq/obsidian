@@ -7,8 +7,8 @@
   "better-tables",
   "code-title-fence",
   "ascii-diagram-to-mermaid",
-  "image-resize-fix",
   "terminal",
   "schedule-countdown",
-  "lojiq-floating-outline"
+  "lojiq-floating-outline",
+  "image-resize-fix"
 ]

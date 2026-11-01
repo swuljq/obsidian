@@ -21,10 +21,77 @@ module.exports = class ImageResizeFixPlugin extends Plugin {
             window.removeEventListener("dblclick", this.onWindowDoubleClick, true);
             window.removeEventListener("dragstart", this.onWindowDragStart, true);
         });
+
+        this.updateImageAlignment(document);
+        const observer = new MutationObserver((mutations) => {
+            for (const mutation of mutations) {
+                if (mutation.type === "attributes") {
+                    // Mode switches need a rescan; ignore our own class changes.
+                    if (mutation.target.matches(".markdown-source-view")) {
+                        this.updateImageAlignment(mutation.target);
+                    }
+                    continue;
+                }
+
+                this.updateImageAlignment(mutation.target, false);
+                for (const node of mutation.addedNodes || []) {
+                    this.updateImageAlignment(node);
+                }
+            }
+        });
+        observer.observe(document.body, {
+            childList: true,
+            characterData: true,
+            attributes: true,
+            attributeFilter: ["class"],
+            subtree: true
+        });
+        this.register(() => {
+            observer.disconnect();
+            document.querySelectorAll(".irq-image-only").forEach(element => {
+                element.classList.remove("irq-image-only");
+            });
+        });
     }
 
     onunload() {
         this.cleanupActiveResize();
+    }
+
+    updateImageAlignment(root, scanDescendants = true) {
+        const selector = ":is(.markdown-reading-view, .markdown-source-view.mod-cm6.is-live-preview) " +
+            ".markdown-rendered :is(p, .image-embed), " +
+            ".markdown-source-view.mod-cm6.is-live-preview :is(.cm-line, .image-embed)";
+        const candidates = new Set();
+        let element = root instanceof Element ? root : root.parentElement;
+        while (element) {
+            if (element.matches(selector) || element.classList.contains("irq-image-only")) {
+                candidates.add(element);
+            }
+            element = element.parentElement;
+        }
+        if (scanDescendants && root.querySelectorAll) {
+            root.querySelectorAll(`${selector}, .irq-image-only`).forEach(candidate => {
+                candidates.add(candidate);
+            });
+        }
+
+        for (const candidate of candidates) {
+            if (!candidate.isConnected) continue;
+            let imageOnly = candidate.matches(selector) && Boolean(candidate.querySelector("img"));
+            // An inline embed must follow its paragraph, never center itself in mixed text.
+            if (candidate.matches(".image-embed") && candidate.parentElement.closest("p, .cm-line")) {
+                imageOnly = false;
+            }
+            if (imageOnly) {
+                const clone = candidate.cloneNode(true);
+                clone.querySelectorAll("img, .embed-actions, .image-resize-corner, .cm-widgetBuffer")
+                    .forEach(node => node.remove());
+                imageOnly = !clone.textContent.replace(/\u200b/g, "").trim() &&
+                    !clone.querySelector("svg, video, audio, iframe, canvas, input, button, hr");
+            }
+            candidate.classList.toggle("irq-image-only", imageOnly);
+        }
     }
 
     isMarkdownImageWrapper(wrapper) {

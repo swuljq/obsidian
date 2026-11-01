@@ -1,81 +1,28 @@
 /*
- * ============================================================
  * Obsidian Image Style
- * ============================================================
  *
- * 功能：
- *   - 插入图片默认居中
- *   - 阅读视图居中
- *   - Live Preview 编辑视图居中
- *   - 不修改图片宽度
- *   - 不影响 Obsidian 图片缩放
- *
- * ============================================================
+ * 仅居中独占段落或独占一行的图片，保留图文混排。
+ * image-resize-fix 插件负责识别并添加 irq-image-only 标记。
+ * 不设置图片宽高，不修改 image-wrapper 的布局或缩放手柄。
  */
 
-
-/* ============================================================
-   01. 阅读视图：图片居中
-   ============================================================ */
-
-.markdown-reading-view
-.markdown-rendered
-p:has(img) {
-
+/* 阅读模式与 Live Preview：图片独占的段落或编辑行。 */
+:is(.markdown-reading-view, .markdown-source-view.mod-cm6.is-live-preview)
+.markdown-rendered p.irq-image-only,
+.markdown-source-view.mod-cm6.is-live-preview .cm-line.irq-image-only {
     text-align: center !important;
-
-    /* 防止继承正文首行缩进 */
     text-indent: 0 !important;
 }
 
-
-/* Obsidian 内部嵌入图片：容器与图片本体都居中。 */
-.markdown-reading-view .markdown-rendered .image-embed {
+/* 阅读模式：没有段落包装的独立嵌入图片。 */
+.markdown-reading-view .markdown-rendered .image-embed.irq-image-only {
     display: block;
+    width: fit-content;
     max-width: 100%;
     margin-inline: auto !important;
-    text-align: center !important;
-    text-indent: 0 !important;
 }
 
-.markdown-reading-view .markdown-rendered img {
-    display: block;
-    max-width: 100%;
-    height: auto;
+/* Live Preview 的独立块级图片：保留原生 flex 容器与缩放定位。 */
+.markdown-source-view.mod-cm6.is-live-preview .image-embed.irq-image-only {
     margin-inline: auto !important;
-}
-
-
-/* ============================================================
-   02. Live Preview：图片所在行居中
-   ============================================================ */
-
-.markdown-source-view.mod-cm6
-.cm-line:has(.image-wrapper) {
-
-    text-align: center !important;
-
-    /* 防止正文的 2em 首行缩进影响图片 */
-    text-indent: 0 !important;
-}
-
-
-/* ============================================================
-   03. 图片本身
-   ============================================================ */
-
-.markdown-rendered img,
-.markdown-source-view.mod-cm6 .image-wrapper img {
-
-    /*
-     * 不设置 width！
-     *
-     * 继续让 Obsidian 自己的：
-     *
-     * width="499"
-     *
-     * 控制图片尺寸。
-     */
-
-    height: auto;
 }

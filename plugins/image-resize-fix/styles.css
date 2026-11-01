@@ -54,6 +54,6 @@
  * Do not set text-align here: image-style.css owns image alignment, and
  * changing it when Obsidian creates .image-wrapper makes the image jump.
  */
-.markdown-source-view.mod-cm6 .cm-line:has(.image-wrapper) {
+.markdown-source-view.mod-cm6.is-live-preview .cm-line.irq-image-only {
     text-indent: 0 !important;
 }

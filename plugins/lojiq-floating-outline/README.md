@@ -34,7 +34,8 @@
 
 直接编辑本插件的 `styles.css`。当前章节的文字和背景由 `--lfo-accent`、
 `--lfo-active-bg` 控制，浅深色分别适配。
-字体使用 `--font-interface`，字号默认 13px，根级标题稍加粗；每层缩进由
+字体使用与笔记标题相同的 `HarmonyOS Sans SC`，由 `typography` 片段提供本地字体资源；
+未加载该字体时回退到系统无衬线字体。字号默认 13px，根级标题稍加粗；每层缩进由
 `--lfo-indent` 控制，默认 14px。折叠箭头仅用于有子标题的条目。
 目录与正文之间的距离由 `--lfo-content-gap` 控制，默认 24px。
 

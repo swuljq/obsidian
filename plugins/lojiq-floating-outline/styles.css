@@ -41,7 +41,7 @@
     overscroll-behavior: contain;
     scrollbar-width: thin;
     padding: 16px 10px;
-    font-family: var(--font-interface);
+    font-family: "HarmonyOS Sans SC", sans-serif;
     font-size: 13px;
     line-height: 1.65;
     color: var(--text-muted, var(--text-normal));

@@ -1,114 +1,20 @@
 /*
- * ============================================================
  * Better Tables
- * 仅优化阅读视图间距
- *
- * 编辑视图完全不修改：
- * - 保留新增行
- * - 保留新增列
- * - 保留拖动行
- * - 保留拖动列
- * - 保留调整宽高
- * ============================================================
+ * 仅收紧阅读模式下只读表格的外部留白。
+ * 单元格排版和操作控件由插件负责，不覆盖嵌套引用或 Callout。
+ * 编辑模式保留原生操作留白、增删、拖动和调整尺寸功能。
  */
 
-
-/* ============================================================
-   01. 阅读视图：去掉表格外层多余空白
-   ============================================================ */
-
+/* Only the owning read-only block's direct frame loses the editing gutter. */
 .markdown-reading-view
-.block-language-table.tk-block
-.cp-table-scroll {
-
+.block-language-table.tk-block.cp-table-readonly > .cp-table-scroll {
     margin: 0 !important;
     padding: 0 !important;
 }
 
-
-/* ============================================================
-   02. 阅读视图：去掉表格左侧、底部预留空间
-   ============================================================ */
-
+/* Keep the original compact block spacing without changing table geometry. */
 .markdown-reading-view
-.block-language-table.tk-block
-.cp-table-root {
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    min-height: 0 !important;
-}
-
-
-/* ============================================================
-   03. 阅读视图：表格本体不要额外 margin
-   ============================================================ */
-
-.markdown-reading-view
-.block-language-table.tk-block
-.cp-table {
-
-    margin: 0 !important;
-}
-
-
-/* ============================================================
-   04. 阅读视图：单元格内容水平、垂直居中且不缩进
-   ============================================================ */
-
-.tk-block.cp-table-readonly
-.cp-table-root
-.cp-table td {
-
-    vertical-align: middle !important;
-    text-align: center !important;
-    text-indent: 0 !important;
-}
-
-.tk-block.cp-table-readonly
-.cp-table-root
-.cp-table td .cp-cell-markdown,
-.tk-block.cp-table-readonly
-.cp-table-root
-.cp-table td .cp-cell-markdown p {
-
-    text-align: center !important;
-    text-indent: 0 !important;
-    text-justify: auto !important;
-    margin-left: 0 !important;
-    padding-left: 0 !important;
-}
-
-
-/* ============================================================
-   05. 阅读视图：
-   隐藏编辑操作控件
-   ============================================================ */
-
-.markdown-reading-view
-.block-language-table.tk-block
-:is(
-    .cp-table-handle,
-    .cp-table-divider,
-    .cp-insert,
-    .cp-table-add,
-    .cp-delete-block,
-    .cp-insert-line
-) {
-
-    display: none !important;
-}
-
-
-/* ============================================================
-   06. 阅读视图：
-   Better Tables 整体不额外占底部空间
-   ============================================================ */
-
-.markdown-reading-view
-.block-language-table.tk-block {
-
+.block-language-table.tk-block.cp-table-readonly {
     margin-bottom: 0 !important;
     padding-bottom: 0 !important;
 }

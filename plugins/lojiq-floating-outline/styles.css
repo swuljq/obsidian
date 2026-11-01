@@ -28,7 +28,6 @@
 .lfo-outline {
     --lfo-accent: #187a57;
     --lfo-active-bg: #e9f4ee;
-    --lfo-guide: rgba(127, 137, 150, 0.22);
     --lfo-indent: 14px;
     position: absolute;
     inset-inline-start: 0;
@@ -108,19 +107,6 @@
     padding: 0;
     margin: 0;
     list-style: none;
-}
-
-.lfo-outline .lfo-item::before {
-    content: "";
-    position: absolute;
-    left: 10px;
-    top: 0;
-    bottom: 0;
-    width: calc(var(--lfo-depth) * var(--lfo-indent));
-    background-image: repeating-linear-gradient(to right,
-        var(--lfo-guide) 0 1px,
-        transparent 1px var(--lfo-indent));
-    pointer-events: none;
 }
 
 .lfo-outline .lfo-heading {

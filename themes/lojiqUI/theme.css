@@ -131,6 +131,10 @@ body:not(.is-mobile) .mod-sidedock .workspace-tabs > .workspace-tab-container {
 }
 
 /* Scope navigation styling to sidebars; never to lists inside notes. */
+:is(.mod-sidedock, .workspace-drawer) {
+  --nav-indentation-guide-color: transparent;
+}
+
 :is(.mod-sidedock, .workspace-drawer) :is(.nav-file-title, .nav-folder-title, .tree-item-self) {
   border-radius: var(--ljq-ui-radius);
   padding-block: 8px;

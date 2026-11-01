@@ -1,0 +1,274 @@
+/*
+ * lojiqUI - application chrome only. Author: lojiq.
+ * Inspired by Baseline 4.1.0 by Alexis C (svnaxis).
+ * No imports or runtime dependency on Baseline.
+ * Note typography, code, lists, images and tables belong to CSS snippets.
+ */
+
+/* EDIT HERE: these private tokens never replace Obsidian's note tokens. */
+body {
+  --ljq-ui-radius: 8px;
+  --ljq-ui-panel-radius: 12px;
+  --ljq-ui-modal-radius: 16px;
+  --ljq-ui-border-width: 1px;
+  --ljq-ui-divider-width: 6px;
+  --ljq-ui-junction-radius: 10px;
+  --ljq-ui-nav-padding: 8px 12px;
+  --ljq-ui-control-height: 32px;
+  --ljq-ui-setting-padding: 16px;
+}
+
+body.theme-light {
+  --ljq-ui-frame: #e5e7eb;
+  --ljq-ui-surface: #ffffff;
+  --ljq-ui-sidebar: #f7f8fa;
+  --ljq-ui-border: #e2e5ea;
+  --ljq-ui-hover: #edf0f3;
+  --ljq-ui-active: #e2e6ec;
+  --ljq-ui-text: #3d3d3d;
+  --ljq-ui-muted: #747474;
+  --ljq-ui-shadow: 0 8px 24px rgb(0 0 0 / 10%);
+  --ljq-ui-divider: var(--ljq-ui-frame);
+  --ljq-ui-divider-hover: #b1b1b1;
+}
+
+body.theme-dark {
+  --ljq-ui-frame: #292d30;
+  --ljq-ui-surface: #191a1c;
+  --ljq-ui-sidebar: #1e1f22;
+  --ljq-ui-border: #303030;
+  --ljq-ui-hover: #292929;
+  --ljq-ui-active: #383838;
+  --ljq-ui-text: #c1c1c1;
+  --ljq-ui-muted: #898989;
+  --ljq-ui-shadow: 0 8px 24px rgb(0 0 0 / 35%);
+  --ljq-ui-divider: var(--ljq-ui-frame);
+  --ljq-ui-divider-hover: #555b60;
+}
+
+/* Window surfaces. Do not set editor backgrounds or shared content colors. */
+.app-container,
+.workspace,
+.workspace-ribbon,
+.workspace > .mod-sidedock {
+  background-color: var(--ljq-ui-frame);
+}
+
+.workspace-drawer {
+  background-color: var(--ljq-ui-sidebar);
+}
+
+.titlebar {
+  background-color: var(--ljq-ui-frame);
+  color: var(--ljq-ui-muted);
+}
+
+body:not(.is-mobile) .workspace :is(.workspace-tabs, .workspace-tab-container) {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* One inset panel: round the header's top and the content's bottom only. */
+body:not(.is-mobile) .workspace .workspace-tabs {
+  background-color: var(--ljq-ui-frame);
+  /* Native resize handles overlap the right edge; keep panel corners clear. */
+  padding-inline-end: var(--ljq-ui-divider-width);
+  padding-block-end: var(--ljq-ui-divider-width);
+  box-sizing: border-box;
+}
+
+body:not(.is-mobile) .workspace .workspace-tabs > .workspace-tab-header-container {
+  border-radius: var(--ljq-ui-junction-radius) var(--ljq-ui-junction-radius) 0 0;
+  border-bottom: var(--ljq-ui-border-width) solid var(--ljq-ui-border);
+  margin-block-end: 0;
+}
+
+body:not(.is-mobile) .workspace .workspace-tabs > .workspace-tab-container {
+  border-radius: 0 0 var(--ljq-ui-junction-radius) var(--ljq-ui-junction-radius);
+  margin-block-start: 0;
+  overflow: hidden;
+}
+
+body:not(.is-mobile) .mod-sidedock .workspace-tabs > .workspace-tab-container {
+  background-color: var(--ljq-ui-sidebar);
+}
+
+/* Tabs keep Obsidian's native sizing, drag regions and collapse behavior. */
+.workspace-tab-header-container {
+  background-color: var(--ljq-ui-sidebar);
+}
+
+.workspace-tab-header {
+  color: var(--ljq-ui-muted);
+}
+
+.workspace-tab-header-inner {
+  border-radius: var(--ljq-ui-radius);
+}
+
+.workspace-tab-header:not(.is-active):hover .workspace-tab-header-inner {
+  background-color: var(--ljq-ui-hover);
+}
+
+.workspace-tab-header.is-active {
+  background-color: var(--ljq-ui-surface);
+  color: var(--ljq-ui-text);
+}
+
+.mod-sidedock .workspace-tab-header-container {
+  padding-block: 8px;
+  align-items: center;
+}
+
+.mod-sidedock .workspace-tab-header-container-inner {
+  gap: 8px;
+}
+
+.mod-sidedock .workspace-tab-header.is-active {
+  background-color: var(--ljq-ui-active);
+  border-radius: var(--ljq-ui-radius);
+  box-shadow: none;
+}
+
+/* Scope navigation styling to sidebars; never to lists inside notes. */
+:is(.mod-sidedock, .workspace-drawer) :is(.nav-file-title, .nav-folder-title, .tree-item-self) {
+  border-radius: var(--ljq-ui-radius);
+  padding-block: 8px;
+  color: var(--ljq-ui-muted);
+}
+
+:is(.mod-sidedock, .workspace-drawer) :is(.nav-file-title, .nav-folder-title, .tree-item-self):hover {
+  background-color: var(--ljq-ui-hover);
+  color: var(--ljq-ui-text);
+}
+
+:is(.mod-sidedock, .workspace-drawer) :is(.nav-file-title, .tree-item-self).is-active {
+  background-color: var(--ljq-ui-active);
+  color: var(--ljq-ui-text);
+}
+
+:is(.mod-sidedock, .workspace-drawer) .nav-header {
+  padding: 8px;
+}
+
+.workspace-ribbon .side-dock-actions {
+  gap: 4px;
+}
+
+/* Only style the actual buttons, not a full-height sidebar overlay. */
+:is(.workspace-ribbon, .workspace-tab-header-container, .view-header, .nav-header) .clickable-icon {
+  border-radius: var(--ljq-ui-radius);
+  color: var(--ljq-ui-muted);
+}
+
+:is(.workspace-ribbon, .workspace-tab-header-container, .view-header, .nav-header) .clickable-icon:hover {
+  background-color: var(--ljq-ui-hover);
+  color: var(--ljq-ui-text);
+}
+
+.view-header {
+  background-color: var(--ljq-ui-surface);
+  border-bottom: var(--ljq-ui-border-width) solid var(--ljq-ui-border);
+}
+
+.view-header-title,
+.view-header-title-parent {
+  color: var(--ljq-ui-muted);
+}
+
+/* Native handles own orientation, position, cursor and drag events. */
+body:not(.is-mobile) .workspace {
+  --divider-width: var(--ljq-ui-divider-width);
+  --divider-width-hover: var(--ljq-ui-divider-width);
+  --divider-color: var(--ljq-ui-divider);
+  --divider-color-hover: var(--ljq-ui-divider-hover);
+}
+
+body:not(.is-mobile) .workspace .workspace-leaf-resize-handle {
+  border-radius: 0;
+  border-color: var(--ljq-ui-divider);
+  background-color: var(--ljq-ui-divider);
+  opacity: 1;
+}
+
+body:not(.is-mobile) .workspace .workspace-leaf-resize-handle:is(:hover, :active) {
+  border-color: var(--ljq-ui-divider-hover);
+  background-color: var(--ljq-ui-divider-hover);
+}
+
+.status-bar {
+  background-color: var(--ljq-ui-frame);
+  border-color: var(--ljq-ui-border);
+  color: var(--ljq-ui-muted);
+}
+
+/* Settings and dialogs. Native scrolling and mobile positioning are retained. */
+.modal,
+.prompt,
+.menu,
+.suggestion-container {
+  background-color: var(--ljq-ui-surface);
+  border: var(--ljq-ui-border-width) solid var(--ljq-ui-border);
+  border-radius: var(--ljq-ui-modal-radius);
+  box-shadow: var(--ljq-ui-shadow);
+}
+
+.modal.mod-settings {
+  --setting-items-background: var(--ljq-ui-sidebar);
+  --setting-items-border-color: var(--ljq-ui-border);
+  --setting-items-radius: var(--ljq-ui-panel-radius);
+  --setting-items-padding-y: var(--ljq-ui-setting-padding);
+}
+
+.modal.mod-settings .vertical-tab-header {
+  background-color: var(--ljq-ui-sidebar);
+  border-right: var(--ljq-ui-border-width) solid var(--ljq-ui-border);
+}
+
+.modal.mod-settings .vertical-tab-nav-item {
+  padding: var(--ljq-ui-nav-padding);
+  border-radius: var(--ljq-ui-radius);
+  color: var(--ljq-ui-muted);
+}
+
+.modal.mod-settings .vertical-tab-nav-item:hover {
+  background-color: var(--ljq-ui-hover);
+}
+
+.modal.mod-settings .vertical-tab-nav-item.is-active {
+  background-color: var(--ljq-ui-active);
+  color: var(--ljq-ui-text);
+}
+
+.modal.mod-settings .setting-item-info {
+  margin-block: auto;
+}
+
+.modal.mod-settings .setting-item-description {
+  padding-top: 0;
+}
+
+:is(.modal, .prompt) :is(button, select, input[type="text"], input[type="search"], input[type="number"]) {
+  border-radius: var(--ljq-ui-radius);
+  min-height: var(--ljq-ui-control-height);
+}
+
+:is(.menu, .suggestion-container, .prompt) :is(.menu-item, .suggestion-item) {
+  border-radius: var(--ljq-ui-radius);
+  padding: var(--ljq-ui-nav-padding);
+}
+
+.menu-item:hover,
+.menu-item.selected,
+.suggestion-item.is-selected {
+  background-color: var(--ljq-ui-hover);
+}
+
+.prompt-results {
+  padding: 8px;
+}
+
+/* The mobile app controls drawer dimensions and touch targets itself. */
+body.is-mobile :is(.mod-sidedock, .workspace-drawer) :is(.nav-file-title, .nav-folder-title, .tree-item-self) {
+  padding-block: 12px;
+}

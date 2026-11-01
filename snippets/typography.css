@@ -1,0 +1,490 @@
+/*
+ * ============================================================
+ * Obsidian Typography
+ * ============================================================
+ *
+ * 用途：
+ *   统一管理 Obsidian 的字体与文字排版。
+ *
+ * 当前字体方案：
+ *
+ *   正文：
+ *     HarmonyOS Sans SC Regular
+ *
+ *   标题：
+ *     HarmonyOS Sans SC Bold
+ *
+ *   代码：
+ *     Cascadia Code
+ *
+ * 本文件负责：
+ *   - 字体
+ *   - 字号
+ *   - 字重
+ *   - 行高
+ *   - 标题间距
+ *   - 正文排版
+ *   - 代码字体
+ *
+ * ============================================================
+ */
+
+
+/* ============================================================
+   01. 字体资源
+   ============================================================ */
+
+
+/* 正文：HarmonyOS Sans SC Regular */
+@font-face {
+    font-family: "HarmonyOS Sans SC";
+    src: url("./fonts/HarmonyOS_Sans_SC_Regular.woff") format("woff");
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+}
+
+
+/* 标题 / 粗体：HarmonyOS Sans SC Bold */
+@font-face {
+    font-family: "HarmonyOS Sans SC";
+    src: url("./fonts/HarmonyOS_Sans_SC_Bold.woff") format("woff");
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+}
+
+
+/* 代码：Cascadia Code */
+@font-face {
+    font-family: "Cascadia Code Local";
+    src: url("./fonts/Cascadia-Code-Regular.ttf") format("truetype");
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+}
+
+
+/* ============================================================
+   02. 全局字体变量
+   ============================================================ */
+
+body {
+
+    /* -------------------------
+       正文字体
+       ------------------------- */
+    --font-text:
+        "HarmonyOS Sans SC",
+        sans-serif;
+
+
+    /* -------------------------
+       Obsidian UI 字体
+       ------------------------- */
+    --font-interface:
+        "HarmonyOS Sans SC",
+        sans-serif;
+
+
+    /* -------------------------
+       代码字体
+       ------------------------- */
+    --font-monospace:
+        "Cascadia Code Local",
+        "Cascadia Code",
+        Consolas,
+        monospace;
+
+
+    /* ========================================================
+       标题字号
+       ======================================================== */
+
+    --h1-size: 1.8em;
+    --h2-size: 1.4em;
+    --h3-size: 1.3em;
+    --h4-size: 1.15em;
+    --h5-size: 1.1em;
+    --h6-size: 1.1em;
+
+
+    /* ========================================================
+       标题行高
+       ======================================================== */
+
+    --h1-line-height: 1.4;
+    --h2-line-height: 1.6;
+    --h3-line-height: 1.6;
+    --h4-line-height: 1.6;
+    --h5-line-height: 1.6;
+    --h6-line-height: 1.6;
+}
+
+
+/* ============================================================
+   03. 正文
+   HarmonyOS Sans SC Regular
+   ============================================================ */
+
+
+/* 编辑模式 / Live Preview */
+.markdown-source-view.mod-cm6 .cm-content {
+    font-family:
+        "HarmonyOS Sans SC",
+        sans-serif;
+
+    font-weight: 400;
+}
+
+
+/* 阅读模式 */
+.markdown-rendered,
+.markdown-reading-view {
+    font-family:
+        "HarmonyOS Sans SC",
+        sans-serif;
+
+    font-weight: 400;
+}
+
+
+/* ============================================================
+   04. 标题基础样式
+   HarmonyOS Sans SC Bold
+   ============================================================ */
+
+
+/* ---------- 阅读模式 ---------- */
+
+.markdown-rendered h1,
+.markdown-rendered h2,
+.markdown-rendered h3,
+.markdown-rendered h4,
+.markdown-rendered h5,
+.markdown-rendered h6 {
+
+    font-family:
+        "HarmonyOS Sans SC",
+        sans-serif;
+
+    font-weight: 700;
+}
+
+
+/* ---------- 编辑 / Live Preview ---------- */
+
+.markdown-source-view.mod-cm6 .HyperMD-header {
+
+    font-family:
+        "HarmonyOS Sans SC",
+        sans-serif;
+
+    font-weight: 700;
+}
+
+
+/* ============================================================
+   05. H1 一级标题
+   ============================================================ */
+
+
+/*
+ * Typora 原主题没有明确指定 H1 字号和 margin，
+ * 这里只保留其“居中”的风格，并采用更适合 Obsidian 的参数。
+ */
+
+.markdown-rendered h1 {
+    font-size: var(--h1-size);
+    line-height: var(--h1-line-height);
+
+    margin-top: 26px;
+    margin-bottom: 26px;
+
+    text-align: center;
+}
+
+
+.markdown-source-view.mod-cm6 .HyperMD-header-1 {
+    font-size: var(--h1-size);
+    line-height: var(--h1-line-height);
+
+    padding-top: 26px;
+    padding-bottom: 26px;
+
+    text-align: center;
+}
+
+
+/* ============================================================
+   06. H2 二级标题
+   Typora：
+   font-size: 1.4rem
+   line-height: 1.6
+   margin: 20px 0
+   ============================================================ */
+
+.markdown-rendered h2 {
+    font-size: var(--h2-size);
+    line-height: var(--h2-line-height);
+
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+
+.markdown-source-view.mod-cm6 .HyperMD-header-2 {
+    font-size: var(--h2-size);
+    line-height: var(--h2-line-height);
+
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+
+/* ============================================================
+   07. H3 三级标题
+   Typora：
+   font-size: 1.3rem
+   margin: 20px 0
+   ============================================================ */
+
+.markdown-rendered h3 {
+    font-size: var(--h3-size);
+    line-height: var(--h3-line-height);
+
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+
+.markdown-source-view.mod-cm6 .HyperMD-header-3 {
+    font-size: var(--h3-size);
+    line-height: var(--h3-line-height);
+
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+
+/* ============================================================
+   08. H4 四级标题
+   Typora：
+   font-size: 1.15rem
+   margin: 20px 0
+   ============================================================ */
+
+.markdown-rendered h4 {
+    font-size: var(--h4-size);
+    line-height: var(--h4-line-height);
+
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+
+.markdown-source-view.mod-cm6 .HyperMD-header-4 {
+    font-size: var(--h4-size);
+    line-height: var(--h4-line-height);
+
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+
+/* ============================================================
+   09. H5 五级标题
+   Typora：
+   font-size: 1.1rem
+   margin: 23px 0
+   ============================================================ */
+
+.markdown-rendered h5 {
+    font-size: var(--h5-size);
+    line-height: var(--h5-line-height);
+
+    margin-top: 23px;
+    margin-bottom: 23px;
+}
+
+
+.markdown-source-view.mod-cm6 .HyperMD-header-5 {
+    font-size: var(--h5-size);
+    line-height: var(--h5-line-height);
+
+    padding-top: 23px;
+    padding-bottom: 23px;
+}
+
+
+/* ============================================================
+   10. H6 六级标题
+   Typora：
+   font-size: 1.1rem
+   margin: 23px 0
+   ============================================================ */
+
+.markdown-rendered h6 {
+    font-size: var(--h6-size);
+    line-height: var(--h6-line-height);
+
+    margin-top: 23px;
+    margin-bottom: 23px;
+}
+
+
+.markdown-source-view.mod-cm6 .HyperMD-header-6 {
+    font-size: var(--h6-size);
+    line-height: var(--h6-line-height);
+
+    padding-top: 23px;
+    padding-bottom: 23px;
+}
+
+
+/* ============================================================
+   11. 加粗文字
+   HarmonyOS Sans SC Bold
+   ============================================================ */
+
+.markdown-rendered strong,
+.markdown-rendered b,
+.markdown-source-view.mod-cm6 .cm-strong {
+
+    font-family:
+        "HarmonyOS Sans SC",
+        sans-serif;
+
+    font-weight: 700;
+}
+
+
+/* ============================================================
+   12. 行内代码
+   Cascadia Code
+   ============================================================ */
+
+.markdown-rendered code,
+.markdown-source-view.mod-cm6 .cm-inline-code {
+
+    font-family:
+        "Cascadia Code Local",
+        "Cascadia Code",
+        Consolas,
+        monospace;
+}
+
+
+/* ============================================================
+   13. 代码块
+   Cascadia Code
+   ============================================================ */
+
+.markdown-rendered pre,
+.markdown-rendered pre code,
+.markdown-source-view.mod-cm6 .HyperMD-codeblock {
+
+    font-family:
+        "Cascadia Code Local",
+        "Cascadia Code",
+        Consolas,
+        monospace;
+}
+/* ============================================================
+   正文排版
+   - 首行缩进 2 个中文字符
+   - 两端对齐
+   - 紧凑段落间距
+   ============================================================ */
+
+
+/* ============================================================
+   01. 阅读模式
+   ============================================================ */
+
+.markdown-rendered p {
+    /* 首行缩进两个中文字符 */
+    text-indent: 2em !important;
+
+    /* 两端对齐 */
+    text-align: justify !important;
+    text-justify: inter-character;
+
+    /* 行高 */
+    line-height: 1.75;
+
+    /* 段落间距 */
+    margin-top: 0 !important;
+    margin-bottom: 0.35em !important;
+}
+
+/* Mermaid uses HTML paragraphs inside SVG foreignObject labels. */
+.markdown-rendered :is(.mermaid, .block-language-mermaid) foreignObject p {
+    text-indent: 0 !important;
+    text-align: center !important;
+    text-justify: auto !important;
+    line-height: 1.5 !important;
+    margin: 0 !important;
+    letter-spacing: normal !important;
+    word-spacing: normal !important;
+}
+
+/* 段落紧跟列表时，消除列表自带的 margin-top，避免间距过大 */
+.markdown-rendered p + ul,
+.markdown-rendered p + ol {
+    margin-top: 0 !important;
+}
+
+/* 列表紧跟段落时，消除列表的 margin-bottom，保持紧凑 */
+.markdown-rendered ul + p,
+.markdown-rendered ol + p {
+    margin-top: 0 !important;
+}
+
+/* 阅读模式：统一收紧列表自身的上下间距 */
+.markdown-rendered ul,
+.markdown-rendered ol {
+    margin-top: 0.2em !important;
+    margin-bottom: 0.2em !important;
+}
+
+/* 阅读模式：列表项之间也收紧 */
+.markdown-rendered li {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+
+/* ============================================================
+   02. 编辑模式 / Live Preview
+   ============================================================ */
+
+.markdown-source-view.mod-cm6
+.cm-line:not(.HyperMD-header)
+:not(.HyperMD-list-line)
+:not(.HyperMD-quote)
+:not(.HyperMD-codeblock) {
+
+    /* 首行缩进 */
+    text-indent: 2em !important;
+
+    /* 两端对齐 */
+    text-align: justify !important;
+    text-justify: inter-character;
+}
+
+
+/* ============================================================
+   03. 编辑模式：缩小段落空白行
+   ============================================================ */
+
+/* 阅读模式：图片居左，缩放时不脱离文档流 */
+.markdown-rendered img {
+    display: block;
+    max-width: 100%;
+}
+
+.markdown-source-view.mod-cm6 .cm-line:has(> br:only-child) {
+    line-height: 0.65em !important;
+    min-height: 0.65em !important;
+}

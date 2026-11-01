@@ -1,0 +1,10 @@
+{
+  "schedule-countdown:insert-schedule-countdown": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "D"
+    }
+  ]
+}

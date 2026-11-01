@@ -1,0 +1,15 @@
+{
+  "theme": "moonstone",
+  "cssTheme": "lojiqUI",
+  "monospaceFontFamily": "Cascadia Code",
+  "enabledCssSnippets": [
+    "table-style",
+    "code-style",
+    "better-table-style",
+    "typography",
+    "list-hierarchy",
+    "image-style",
+    "content-style"
+  ],
+  "showRibbon": true
+}

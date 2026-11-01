@@ -1,0 +1,9 @@
+{
+  "id": "schedule-countdown",
+  "name": "Schedule Countdown",
+  "version": "1.1.1",
+  "minAppVersion": "1.5.0",
+  "description": "Insert date ranges and show automatically updating countdown labels beside tasks.",
+  "author": "Local",
+  "isDesktopOnly": false
+}

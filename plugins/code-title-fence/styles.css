@@ -1,0 +1,365 @@
+/*
+ * Code Title Fence
+ *
+ * Features:
+ *   - ```python:main.py -> title "main.py" + language "python"
+ *   - Automatic line numbers for every fenced block with a language
+ *   - Keeps the original highlighted <code> DOM untouched
+ *
+ * Your existing code-style.css continues to control the main code appearance.
+ */
+
+/* ============================================================
+   Wrapper
+   ============================================================ */
+
+.markdown-rendered .ctf-code-block {
+    margin: 1em 0 !important;
+}
+
+.markdown-rendered .ctf-code-body {
+    position: relative;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* The wrapper owns the outer margin, not <pre>. */
+.markdown-rendered .ctf-code-block .ctf-code-body > pre {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+
+/* ============================================================
+   Title bar
+   ============================================================ */
+
+.markdown-rendered .ctf-code-title {
+    display: flex;
+    align-items: center;
+
+    margin: 0 !important;
+    padding: 7px 14px;
+
+    font-family:
+        "Cascadia Code Local",
+        "Cascadia Code",
+        Consolas,
+        monospace;
+
+    font-size: 0.82em;
+    font-weight: 600;
+    line-height: 1.4;
+
+    color: var(--text-muted);
+    background: var(--custom-code-bg, var(--background-secondary));
+
+    border: 1px solid var(--custom-code-border, var(--background-modifier-border));
+    border-bottom: none;
+
+    border-radius:
+        var(--custom-code-radius, 8px)
+        var(--custom-code-radius, 8px)
+        0
+        0;
+
+    text-indent: 0 !important;
+    user-select: none;
+}
+
+.markdown-rendered .ctf-code-title-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Join the title and code body into one visual card. */
+.markdown-rendered .ctf-code-block.ctf-has-title .ctf-code-body > pre {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+}
+
+
+/* ============================================================
+   Line-number gutter
+   ============================================================ */
+
+.markdown-rendered .ctf-line-numbers {
+    position: absolute;
+    z-index: 2;
+
+    top: 0;
+    bottom: 0;
+    left: 0;
+
+    width: 3.4em;
+    box-sizing: border-box;
+
+    /* These values are synchronized from the actual rendered <pre>/<code>. */
+    padding-top: var(--ctf-code-padding-top, 38px);
+    padding-bottom: var(--ctf-code-padding-bottom, 14px);
+    padding-left: 6px;
+    padding-right: 8px;
+
+    font-family:
+        "Cascadia Code Local",
+        "Cascadia Code",
+        Consolas,
+        monospace;
+
+    font-size: var(--ctf-code-font-size, var(--custom-code-font-size, 0.92em));
+    line-height: var(--ctf-code-line-height, var(--custom-code-line-height, 1.65));
+    font-variant-numeric: tabular-nums;
+
+    text-align: right;
+    color: var(--text-faint);
+
+    border-right: 1px solid var(--custom-code-border, var(--background-modifier-border));
+
+    user-select: none;
+    pointer-events: none;
+
+    /* Keep the gutter visually attached to the left side while code scrolls. */
+    background: var(--custom-code-bg, var(--background-secondary));
+}
+
+.markdown-rendered .ctf-line-number {
+    display: block;
+    margin: 0;
+    padding: 0;
+    height: auto;
+    white-space: nowrap;
+}
+
+/* Reserve room for the gutter without changing the code text itself. */
+.markdown-rendered .ctf-code-block .ctf-code-body > pre.ctf-has-line-numbers {
+    padding-left: calc(var(--custom-code-padding-x, 16px) + 3.4em) !important;
+}
+
+/* With a title, the gutter should not create a new rounded top-left corner. */
+.markdown-rendered .ctf-code-block.ctf-has-title .ctf-line-numbers {
+    border-top-left-radius: 0;
+}
+
+/* ============================================================
+   v1.1.1 compatibility fixes
+   ============================================================ */
+
+/*
+ * The user's language badge is created by pre.language-*::before.
+ * Once a line-number gutter exists, move that badge to the actual code
+ * column instead of letting it sit inside the line-number area.
+ */
+.markdown-rendered
+.ctf-code-block
+.ctf-code-body > pre.ctf-has-line-numbers[class*="language-"]::before {
+    left: calc(var(--custom-code-padding-x, 16px) + 3.4em) !important;
+    right: auto !important;
+}
+
+/* ============================================================
+   v1.1.3: keep every number on the exact gutter line-height
+   ============================================================ */
+
+.markdown-rendered .ctf-line-number {
+    line-height: inherit !important;
+}
+
+
+/* ============================================================
+   v1.1.4: keep one source line = one visual row
+   ============================================================ */
+
+/*
+ * Themes/snippets may change <pre>/<code> to pre-wrap. That makes a long
+ * logical line occupy several visual rows while the gutter still represents
+ * source lines. Force fenced code to stay unwrapped and scroll horizontally.
+ */
+.markdown-rendered
+.ctf-code-block
+.ctf-code-body > pre.ctf-has-line-numbers {
+    white-space: pre !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+    overflow-x: auto !important;
+}
+
+.markdown-rendered
+.ctf-code-block
+.ctf-code-body > pre.ctf-has-line-numbers > code {
+    white-space: pre !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+}
+
+/* ============================================================
+   v1.1.5: isolate gutter from horizontal scrolling
+   ============================================================ */
+
+/*
+ * Previous versions placed the line-number gutter absolutely on top of the
+ * same <pre> that performed horizontal scrolling. When scrollLeft > 0, the
+ * code could slide underneath the gutter and visually collide with numbers.
+ *
+ * v1.1.5 makes the body a two-column grid:
+ *   [ fixed line-number gutter ] [ independently scrollable code ]
+ *
+ * This also gives both sides one shared outer box, which removes small
+ * alignment/stacking inconsistencies between themes and snippets.
+ */
+.markdown-rendered
+.ctf-code-block
+.ctf-code-body {
+    display: grid !important;
+    grid-template-columns: 3.4em minmax(0, 1fr) !important;
+    align-items: stretch !important;
+
+    position: relative !important;
+    overflow: hidden !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    background: var(--custom-code-bg, var(--background-secondary)) !important;
+    border: 1px solid var(--custom-code-border, var(--background-modifier-border)) !important;
+    border-radius: var(--custom-code-radius, 8px) !important;
+}
+
+.markdown-rendered
+.ctf-code-block.ctf-has-title
+.ctf-code-body {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+}
+
+/* The gutter is now a real grid column rather than an overlay. */
+.markdown-rendered
+.ctf-code-block
+.ctf-line-numbers {
+    position: relative !important;
+    z-index: 3 !important;
+
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+    height: auto !important;
+
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+
+    padding-top: var(--ctf-code-padding-top, 38px) !important;
+    padding-bottom: var(--ctf-code-padding-bottom, 14px) !important;
+    padding-left: 6px !important;
+    padding-right: 8px !important;
+
+    background: var(--custom-code-bg, var(--background-secondary)) !important;
+    border-right: 1px solid var(--custom-code-border, var(--background-modifier-border)) !important;
+}
+
+/*
+ * Only the code column scrolls horizontally. The gutter never participates in
+ * scrollLeft, so code text can no longer move through/under the line numbers.
+ */
+.markdown-rendered
+.ctf-code-block
+.ctf-code-body > pre.ctf-has-line-numbers {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+
+    margin: 0 !important;
+
+    /* The shared body owns the card border/background. */
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+
+    /* No longer reserve gutter width inside PRE: it is a separate column. */
+    padding-left: var(--custom-code-padding-x, 16px) !important;
+    padding-right: var(--custom-code-padding-x, 16px) !important;
+
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+
+    white-space: pre !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+}
+
+.markdown-rendered
+.ctf-code-block
+.ctf-code-body > pre.ctf-has-line-numbers > code {
+    white-space: pre !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+}
+
+/* Language badge belongs to the code column now, not gutter + code combined. */
+.markdown-rendered
+.ctf-code-block
+.ctf-code-body > pre.ctf-has-line-numbers[class*="language-"]::before {
+    left: var(--custom-code-padding-x, 16px) !important;
+    right: auto !important;
+}
+
+/* Keep number rows mechanically identical to the measured code line box. */
+.markdown-rendered
+.ctf-code-block
+.ctf-line-number {
+    display: block !important;
+    height: var(--ctf-code-line-height, 1.65em) !important;
+    min-height: var(--ctf-code-line-height, 1.65em) !important;
+    line-height: var(--ctf-code-line-height, 1.65em) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+}
+
+
+/* ============================================================
+   v1.1.6: keep native copy button fixed while code scrolls
+   ============================================================ */
+
+/*
+ * The native Obsidian copy button is moved out of the horizontally
+ * scrollable <pre> and into .ctf-code-body by main.js. This keeps the
+ * button pinned to the visible top-right corner of the code card.
+ */
+.markdown-rendered
+.ctf-code-block
+.ctf-code-body > .ctf-copy-button {
+    position: absolute !important;
+    z-index: 20 !important;
+
+    top: 9px !important;
+    right: 12px !important;
+    bottom: auto !important;
+    left: auto !important;
+
+    margin: 0 !important;
+    transform: none !important;
+}
+
+/*
+ * The language badge is still generated by code-style.css as
+ * pre.language-*::before. Compensate for PRE.scrollLeft so the badge stays
+ * visually anchored to the left edge of the code column during horizontal
+ * scrolling instead of disappearing off-screen.
+ */
+.markdown-rendered
+.ctf-code-block
+.ctf-code-body > pre.ctf-has-line-numbers[class*="language-"]::before {
+    transform: translateX(var(--ctf-scroll-left, 0px)) !important;
+    z-index: 10 !important;
+}

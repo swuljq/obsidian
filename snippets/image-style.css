@@ -1,0 +1,81 @@
+/*
+ * ============================================================
+ * Obsidian Image Style
+ * ============================================================
+ *
+ * 功能：
+ *   - 插入图片默认居中
+ *   - 阅读视图居中
+ *   - Live Preview 编辑视图居中
+ *   - 不修改图片宽度
+ *   - 不影响 Obsidian 图片缩放
+ *
+ * ============================================================
+ */
+
+
+/* ============================================================
+   01. 阅读视图：图片居中
+   ============================================================ */
+
+.markdown-reading-view
+.markdown-rendered
+p:has(img) {
+
+    text-align: center !important;
+
+    /* 防止继承正文首行缩进 */
+    text-indent: 0 !important;
+}
+
+
+/* Obsidian 内部嵌入图片：容器与图片本体都居中。 */
+.markdown-reading-view .markdown-rendered .image-embed {
+    display: block;
+    max-width: 100%;
+    margin-inline: auto !important;
+    text-align: center !important;
+    text-indent: 0 !important;
+}
+
+.markdown-reading-view .markdown-rendered img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin-inline: auto !important;
+}
+
+
+/* ============================================================
+   02. Live Preview：图片所在行居中
+   ============================================================ */
+
+.markdown-source-view.mod-cm6
+.cm-line:has(.image-wrapper) {
+
+    text-align: center !important;
+
+    /* 防止正文的 2em 首行缩进影响图片 */
+    text-indent: 0 !important;
+}
+
+
+/* ============================================================
+   03. 图片本身
+   ============================================================ */
+
+.markdown-rendered img,
+.markdown-source-view.mod-cm6 .image-wrapper img {
+
+    /*
+     * 不设置 width！
+     *
+     * 继续让 Obsidian 自己的：
+     *
+     * width="499"
+     *
+     * 控制图片尺寸。
+     */
+
+    height: auto;
+}

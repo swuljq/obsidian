@@ -1,0 +1,25 @@
+# Per-device workspace layout and recently opened notes.
+workspace*.json
+
+# Plugin settings can contain credentials, local paths and runtime state.
+plugins/*/data.json
+plugins/*/*-migrations.json
+plugins/*/cache/
+plugins/*/logs/
+
+# Installed dependencies, backup archives and generated files.
+node_modules/
+*.zip
+*.log
+*.bak
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# Credentials must never be committed.
+.env
+.env.*
+*.pem
+*.key
+credentials*.json

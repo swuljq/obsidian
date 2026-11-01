@@ -1,0 +1,74 @@
+.scd-countdown {
+    --scd-color: var(--text-accent);
+    --scd-background: color-mix(in srgb, var(--interactive-accent) 14%, transparent);
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.55em;
+    margin-inline-start: 0.35em;
+    padding: 0.05em 0.58em;
+    border: 1px solid color-mix(in srgb, var(--scd-color) 38%, transparent);
+    border-radius: 999px;
+    background: var(--scd-background);
+    color: var(--scd-color);
+    font-family: var(--font-interface);
+    font-size: 0.78em;
+    font-weight: 650;
+    line-height: 1.35;
+    vertical-align: 0.08em;
+    white-space: nowrap;
+}
+
+code.scd-reading-label {
+    font-family: var(--font-interface);
+}
+
+.scd-status-due-today {
+    --scd-color: var(--color-orange);
+    --scd-background: color-mix(in srgb, var(--color-orange) 15%, transparent);
+}
+
+.scd-status-overdue {
+    --scd-color: var(--color-red);
+    --scd-background: color-mix(in srgb, var(--color-red) 14%, transparent);
+}
+
+.scd-status-completed {
+    --scd-color: var(--text-muted);
+    --scd-background: color-mix(in srgb, var(--text-muted) 11%, transparent);
+    text-decoration: none;
+}
+
+.scd-completion-time {
+    display: inline-block;
+    color: var(--text-muted);
+    text-decoration: none !important;
+}
+
+.scd-modal form {
+    display: grid;
+    gap: 1rem;
+}
+
+.scd-modal-field {
+    display: grid;
+    grid-template-columns: minmax(5em, auto) minmax(11em, 1fr);
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.scd-modal-field label {
+    color: var(--text-muted);
+    font-size: var(--font-ui-small);
+    font-weight: 600;
+}
+
+.scd-modal-field input[type="date"] {
+    width: 100%;
+}
+
+.scd-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.65rem;
+    margin-top: 0.25rem;
+}

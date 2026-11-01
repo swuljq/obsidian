@@ -1,0 +1,9 @@
+{
+  "id": "lojiq-floating-outline",
+  "name": "lojiq Floating Outline",
+  "version": "1.1.1",
+  "minAppVersion": "1.5.0",
+  "description": "A resizable in-pane heading outline with collapsible sections and green navigation markers.",
+  "author": "lojiq",
+  "isDesktopOnly": true
+}

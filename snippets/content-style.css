@@ -1,0 +1,435 @@
+/* ============================================================
+   项目目录树 / 文件结构
+   使用方法：
+   > [!tree]
+   > my-project/
+   > ├── pom.xml
+   > └── src/
+   ============================================================ */
+
+.callout[data-callout="tree"] {
+    /* 去掉 Obsidian Callout 默认强调色 */
+    --callout-color: 120, 120, 120;
+
+    /* 整体 */
+    background: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 8px;
+
+    /* 间距 */
+    padding: 12px 16px;
+    margin: 12px 0;
+
+    /* 不要阴影，保持简约 */
+    box-shadow: none;
+}
+
+
+/* 隐藏 tree 标题和图标 */
+.callout[data-callout="tree"] .callout-title {
+    display: none;
+}
+
+
+/* 内容区域 */
+.callout[data-callout="tree"] .callout-content {
+    margin: 0;
+    padding: 0;
+
+    font-family:
+        "Cascadia Code Local",
+        "Cascadia Code",
+        Consolas,
+        monospace;
+
+    font-size: 0.92em;
+    line-height: 1.65;
+
+    color: var(--text-normal);
+}
+
+
+/* Tree 内部段落不继承普通正文的首行缩进和两端对齐 */
+.callout[data-callout="tree"] .callout-content p {
+    margin: 0;
+    text-indent: 0 !important;
+    text-align: left !important;
+    text-justify: auto !important;
+}
+
+
+/* 鼠标悬停时只稍微突出边框 */
+.callout[data-callout="tree"]:hover {
+    border-color: var(--text-faint);
+}
+/* ============================================================
+   普通引用块
+   使用方法：
+   > 这是一段普通引用
+   > 第二行内容
+
+   样式：
+   - 背景、边框、圆角与 Tree 完全一致
+   - 字体与 Tree 完全一致
+   - 保留一条简约竖线
+   ============================================================ */
+
+.markdown-rendered blockquote {
+    /* 与 Tree 完全一致 */
+    background: var(--background-secondary) !important;
+    border: 1px solid var(--background-modifier-border) !important;
+    border-radius: 8px !important;
+
+    padding: 12px 16px 12px 38px !important;
+    margin: 12px 0 !important;
+
+    box-shadow: none !important;
+
+    /* Tree 使用的字体 */
+    font-family:
+        "Cascadia Code Local",
+        "Cascadia Code",
+        Consolas,
+        monospace !important;
+
+    font-size: 0.92em !important;
+    line-height: 1.65 !important;
+
+    color: var(--text-normal) !important;
+
+    /* 给内部竖线定位 */
+    position: relative;
+}
+
+
+/* ============================================================
+   引用块内部竖线
+   ============================================================ */
+
+.markdown-rendered blockquote::before {
+    content: "";
+
+    position: absolute;
+
+    left: 16px;
+    top: 12px;
+    bottom: 12px;
+
+    width: 3px;
+
+    background: var(--text-faint);
+
+    border-radius: 999px;
+}
+
+
+/* ============================================================
+   去掉内部段落默认间距
+   与 Tree 一样紧凑
+   ============================================================ */
+
+.markdown-rendered blockquote p {
+    margin: 0 !important;
+    padding: 0 !important;
+    text-indent: 0 !important;
+    text-align: left !important;
+    text-justify: auto !important;
+}
+
+
+/* 多段内容之间留一点点距离 */
+.markdown-rendered blockquote > p + p {
+    margin-top: 0.4em !important;
+}
+
+
+/* ============================================================
+   Hover
+   与 Tree 一致
+   ============================================================ */
+
+.markdown-rendered blockquote:hover {
+    border-color: var(--text-faint) !important;
+}
+/* ============================================================
+   Tree 自动目录线
+   ------------------------------------------------------------
+   使用方法：
+
+   > [!tree]
+   > - my-project/
+   >   - pom.xml
+   >   - src/
+   >     - main/
+   >     - test/
+
+   不再需要手动输入：
+   ├──
+   │
+   └──
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   Tree 列表基础设置
+   ------------------------------------------------------------ */
+
+.callout[data-callout="tree"] .callout-content ul {
+    /* 去掉 Markdown 默认圆点 */
+    list-style: none !important;
+
+    /* 清除默认列表间距 */
+    margin: 0 !important;
+
+    /* 为下一层树枝留下空间 */
+    padding-left: 1.5em !important;
+}
+
+
+/* ------------------------------------------------------------
+   第一层：根节点
+   不显示左侧树枝
+   ------------------------------------------------------------ */
+
+.callout[data-callout="tree"] .callout-content > ul {
+    padding-left: 0 !important;
+}
+
+
+/* ------------------------------------------------------------
+   每个节点
+   ------------------------------------------------------------ */
+
+.callout[data-callout="tree"] .callout-content li {
+    position: relative;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    line-height: 1.65;
+}
+
+
+/* ------------------------------------------------------------
+   子目录的竖线
+   │
+   ------------------------------------------------------------ */
+
+.callout[data-callout="tree"] .callout-content li > ul {
+    position: relative;
+
+    margin-left: 0.35em !important;
+}
+
+
+/* 子级 ul 左侧画竖线 */
+.callout[data-callout="tree"] .callout-content li > ul::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+    bottom: 0;
+
+    width: 1px;
+
+    background: var(--text-faint);
+}
+
+
+/* ------------------------------------------------------------
+   子节点的横线
+   ├──
+   ------------------------------------------------------------ */
+
+.callout[data-callout="tree"] .callout-content li > ul > li::before {
+    content: "";
+
+    position: absolute;
+
+    /* 对准父级竖线 */
+    left: -1.15em;
+
+    /* 对准文字中部 */
+    top: 0.82em;
+
+    width: 0.85em;
+    height: 1px;
+
+    background: var(--text-faint);
+}
+
+
+/* ------------------------------------------------------------
+   最后一个节点：
+   遮住下面多余的竖线，形成 └──
+   ------------------------------------------------------------ */
+
+.callout[data-callout="tree"] .callout-content li > ul > li:last-child::after {
+    content: "";
+
+    position: absolute;
+
+    left: -1.16em;
+    top: 0.84em;
+    bottom: 0;
+
+    width: 3px;
+
+    background: var(--background-secondary);
+}
+
+
+/* ------------------------------------------------------------
+   防止 Obsidian 默认列表 marker 出现
+   ------------------------------------------------------------ */
+
+.callout[data-callout="tree"] li::marker {
+    content: "";
+}
+
+
+/* ------------------------------------------------------------
+   列表嵌套不要额外产生上下空白
+   ------------------------------------------------------------ */
+
+.callout[data-callout="tree"] .callout-content ul ul {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+/* ============================================================
+   Tree 一键复制按钮
+   ------------------------------------------------------------
+   注意：
+   这里负责按钮的外观。
+   真正的复制功能由 tree-copy-button 插件的 main.js 实现。
+   ============================================================ */
+
+
+/* Tree 作为按钮定位容器 */
+.callout[data-callout="tree"] {
+    position: relative;
+}
+
+
+/* ============================================================
+   复制按钮
+   ============================================================ */
+
+.callout[data-callout="tree"] .tree-copy-button {
+    position: absolute;
+
+    top: 8px;
+    right: 10px;
+
+    width: 28px;
+    height: 28px;
+
+    padding: 0;
+    margin: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* 极简透明按钮 */
+    background: transparent !important;
+
+    border: none !important;
+    border-radius: 6px;
+
+    box-shadow: none !important;
+
+    /* 图标颜色 */
+    color: var(--text-muted);
+
+    /* 默认不要太抢眼 */
+    opacity: 0.42;
+
+    cursor: pointer;
+
+    z-index: 20;
+
+    transition:
+        opacity 0.15s ease,
+        color 0.15s ease,
+        background-color 0.15s ease,
+        transform 0.1s ease;
+}
+
+
+/* ============================================================
+   图标本身
+   ============================================================ */
+
+.callout[data-callout="tree"]
+.tree-copy-button svg {
+
+    width: 16px;
+    height: 16px;
+
+    stroke-width: 1.8;
+}
+
+
+/* ============================================================
+   鼠标进入整个 Tree
+   复制按钮稍微变明显
+   ============================================================ */
+
+.callout[data-callout="tree"]:hover
+.tree-copy-button {
+
+    opacity: 0.75;
+}
+
+
+/* ============================================================
+   鼠标真正放到复制按钮上
+   ============================================================ */
+
+.callout[data-callout="tree"]
+.tree-copy-button:hover {
+
+    opacity: 1;
+
+    color: var(--text-normal);
+
+    background:
+        var(--background-modifier-hover) !important;
+}
+
+
+/* ============================================================
+   点击按钮时
+   ============================================================ */
+
+.callout[data-callout="tree"]
+.tree-copy-button:active {
+
+    transform: scale(0.90);
+}
+
+
+/* ============================================================
+   防止 Obsidian 默认 button 样式干扰
+   ============================================================ */
+
+.callout[data-callout="tree"]
+.tree-copy-button:focus {
+
+    outline: none;
+    box-shadow: none;
+}
+
+
+/* ============================================================
+   可选：
+   第一行特别长时，给右边复制按钮留一点空间
+   ============================================================ */
+
+.callout[data-callout="tree"] .callout-content {
+    padding-right: 30px;
+}
+

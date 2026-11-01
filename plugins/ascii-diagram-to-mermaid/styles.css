@@ -1,0 +1,123 @@
+.adm-pre-wrap {
+  position: relative;
+}
+
+.adm-convert-button {
+  position: absolute;
+  top: 8px;
+  right: 42px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 7px;
+  border: 0;
+  border-radius: 5px;
+  color: var(--text-muted);
+  background: var(--background-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 120ms ease, background-color 120ms ease, color 120ms ease;
+}
+
+.adm-pre-wrap:hover .adm-convert-button,
+.adm-convert-button:focus-visible,
+.adm-convert-button.adm-busy {
+  opacity: 1;
+}
+
+.adm-convert-button:hover {
+  color: var(--text-normal);
+  background: var(--background-modifier-hover);
+}
+
+.adm-convert-button.adm-busy {
+  cursor: wait;
+}
+
+/* ── Mermaid 全屏按钮 ─────────────────────────────────────── */
+.adm-mermaid-wrap {
+  position: relative;
+}
+
+.adm-fullscreen-button {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  color: var(--text-muted);
+  background: var(--background-secondary);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 120ms ease, background-color 120ms ease, color 120ms ease;
+}
+
+.adm-mermaid-wrap:hover .adm-fullscreen-button,
+.adm-fullscreen-button:focus-visible {
+  opacity: 1;
+}
+
+.adm-fullscreen-button:hover {
+  color: var(--text-normal);
+  background: var(--background-modifier-hover);
+}
+
+/* ── Mermaid 全屏 Modal ───────────────────────────────────── */
+
+/* Modal 容器：只控制尺寸上限，不覆盖 Obsidian 的定位逻辑 */
+.adm-fullscreen-modal {
+  width: min(95vw, 95dvw) !important;
+  max-width: min(95vw, 95dvw) !important;
+  max-height: min(95vh, 95dvh) !important;
+  padding: 0 !important;
+}
+
+/* 内容区：填满 modal，居中放 SVG，允许内部滚动 */
+.adm-fullscreen-content {
+  width: 100%;
+  height: 100%;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+/* SVG 等比缩放至内容区，不超出 */
+.adm-fullscreen-content svg {
+  max-width: 100% !important;
+  max-height: calc(95vh - 48px) !important;
+  width: auto !important;
+  height: auto !important;
+  display: block;
+  margin: auto;
+}
+
+/* ── Mermaid 正文内自适应缩放 ────────────────────────────── */
+/* 容器不超出正文宽度，不横向滚动 */
+.markdown-rendered :is(.block-language-mermaid, .mermaid) {
+  overflow-x: visible;
+  max-width: 100%;
+}
+
+/* SVG：超宽时等比缩小至正文宽度，本来就窄则原尺寸居中 */
+.markdown-rendered :is(.block-language-mermaid, .mermaid) > svg {
+  display: block;
+  /* 超宽时缩小 */
+  max-width: 100% !important;
+  /* 宽度由内容决定，不强制撑满 */
+  width: auto !important;
+  height: auto !important;
+  margin-inline: auto;
+}

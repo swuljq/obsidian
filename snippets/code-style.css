@@ -1,0 +1,905 @@
+/*
+ * ============================================================
+ * Obsidian Code Block Style
+ * ============================================================
+ *
+ * 风格：
+ *   - 简洁技术文档
+ *   - Cascadia Code
+ *   - 浅灰背景
+ *   - 清晰细边框
+ *   - 8px 圆角
+ *   - 阅读视图 / Live Preview
+ *
+ * ============================================================
+ */
+
+
+/* ============================================================
+   01. 全局参数
+   ============================================================ */
+
+body {
+
+    --custom-code-radius: 8px;
+
+    --custom-code-padding-x: 16px;
+    --custom-code-padding-y: 14px;
+
+    --custom-code-font-size: 0.92em;
+
+    --custom-code-line-height: 1.65;
+}
+
+
+/* ============================================================
+   02. 浅色模式
+   ============================================================ */
+
+.theme-light {
+
+    --custom-code-bg:
+        rgba(0, 0, 0, 0.028);
+
+    --custom-code-border:
+        rgba(0, 0, 0, 0.14);
+}
+
+
+/* ============================================================
+   03. 深色模式
+   ============================================================ */
+
+.theme-dark {
+
+    --custom-code-bg:
+        rgba(255, 255, 255, 0.035);
+
+    --custom-code-border:
+        rgba(255, 255, 255, 0.14);
+}
+
+
+/* ============================================================
+   04. 阅读视图：代码块
+   ============================================================ */
+
+.markdown-rendered pre {
+
+    margin:
+        1em 0 !important;
+
+    padding:
+        var(--custom-code-padding-y)
+        var(--custom-code-padding-x) !important;
+
+    background:
+        var(--custom-code-bg) !important;
+
+    border:
+        1px solid
+        var(--custom-code-border) !important;
+
+    border-radius:
+        var(--custom-code-radius) !important;
+
+    box-shadow:
+        none !important;
+
+    overflow-x:
+        auto;
+}
+
+
+/* ============================================================
+   05. 阅读视图：代码文字
+   ============================================================ */
+
+.markdown-rendered pre code {
+
+    font-family:
+        "Cascadia Code Local",
+        "Cascadia Code",
+        Consolas,
+        monospace !important;
+
+    font-size:
+        var(--custom-code-font-size) !important;
+
+    line-height:
+        var(--custom-code-line-height) !important;
+
+    background:
+        transparent !important;
+
+    padding:
+        0 !important;
+
+    border:
+        none !important;
+
+    color:
+        var(--text-normal);
+}
+
+
+/* ============================================================
+   06. Live Preview：代码块每一行
+   ============================================================ */
+
+.markdown-source-view.mod-cm6
+.cm-line.HyperMD-codeblock {
+
+    font-family:
+        "Cascadia Code Local",
+        "Cascadia Code",
+        Consolas,
+        monospace !important;
+
+    font-size:
+        var(--custom-code-font-size);
+
+    line-height:
+        var(--custom-code-line-height);
+
+    background:
+        var(--custom-code-bg) !important;
+
+    border-left:
+        1px solid
+        var(--custom-code-border);
+
+    border-right:
+        1px solid
+        var(--custom-code-border);
+
+    padding-left:
+        var(--custom-code-padding-x) !important;
+
+    padding-right:
+        var(--custom-code-padding-x) !important;
+
+    text-indent:
+        0 !important;
+}
+
+
+/* ============================================================
+   07. Live Preview：第一行
+   ============================================================ */
+
+.markdown-source-view.mod-cm6
+.cm-line.HyperMD-codeblock-begin {
+
+    padding-top:
+        var(--custom-code-padding-y) !important;
+
+    border-top:
+        1px solid
+        var(--custom-code-border);
+
+    border-top-left-radius:
+        var(--custom-code-radius);
+
+    border-top-right-radius:
+        var(--custom-code-radius);
+}
+
+
+/* ============================================================
+   08. Live Preview：最后一行
+   ============================================================ */
+
+.markdown-source-view.mod-cm6
+.cm-line.HyperMD-codeblock-end {
+
+    padding-bottom:
+        var(--custom-code-padding-y) !important;
+
+    border-bottom:
+        1px solid
+        var(--custom-code-border);
+
+    border-bottom-left-radius:
+        var(--custom-code-radius);
+
+    border-bottom-right-radius:
+        var(--custom-code-radius);
+}
+
+
+/* ============================================================
+   09. 代码块不要继承正文首行缩进
+   ============================================================ */
+
+.markdown-source-view.mod-cm6
+.cm-line.HyperMD-codeblock {
+
+    text-indent:
+        0 !important;
+
+    text-align:
+        left !important;
+}
+
+
+/* ============================================================
+   10. 阅读视图滚动条
+   ============================================================ */
+
+.markdown-rendered pre::-webkit-scrollbar {
+
+    height:
+        8px;
+}
+
+
+.markdown-rendered pre::-webkit-scrollbar-track {
+
+    background:
+        transparent;
+}
+
+
+.markdown-rendered pre::-webkit-scrollbar-thumb {
+
+    background:
+        var(--text-faint);
+
+    border-radius:
+        999px;
+}
+
+
+.markdown-rendered pre::-webkit-scrollbar-thumb:hover {
+
+    background:
+        var(--text-muted);
+}
+/* ============================================================
+   11. 代码块语言标签
+   ============================================================ */
+
+/* 给带语言的代码块留一点顶部空间 */
+.markdown-rendered pre[class*="language-"] {
+    position: relative;
+    padding-top: 38px !important;
+}
+
+
+/* 语言标签 */
+.markdown-rendered pre[class*="language-"]::before {
+    content: var(--code-lang-label, "CODE");
+
+    position: absolute;
+
+    top: 9px;
+    left: 14px;
+
+    padding: 2px 7px;
+
+    border-radius: 4px;
+
+    font-family:
+        "Cascadia Code Local",
+        "Cascadia Code",
+        Consolas,
+        monospace;
+
+    font-size: 0.72em;
+    font-weight: 600;
+
+    line-height: 1.4;
+
+    color: var(--text-muted);
+
+    background: var(--background-secondary);
+
+    user-select: none;
+}
+
+
+/* ============================================================
+   12. 常用语言名称
+   ============================================================ */
+
+.markdown-rendered pre.language-cpp {
+    --code-lang-label: "C++";
+}
+
+.markdown-rendered pre.language-c {
+    --code-lang-label: "C";
+}
+
+.markdown-rendered pre.language-python {
+    --code-lang-label: "Python";
+}
+
+.markdown-rendered pre.language-py {
+    --code-lang-label: "Python";
+}
+
+.markdown-rendered pre.language-verilog {
+    --code-lang-label: "Verilog";
+}
+
+.markdown-rendered pre.language-systemverilog {
+    --code-lang-label: "SystemVerilog";
+}
+
+.markdown-rendered pre.language-sv {
+    --code-lang-label: "SystemVerilog";
+}
+
+.markdown-rendered pre.language-vhdl {
+    --code-lang-label: "VHDL";
+}
+
+.markdown-rendered pre.language-bash {
+    --code-lang-label: "Bash";
+}
+
+.markdown-rendered pre.language-shell {
+    --code-lang-label: "Shell";
+}
+
+.markdown-rendered pre.language-sh {
+    --code-lang-label: "Shell";
+}
+
+.markdown-rendered pre.language-json {
+    --code-lang-label: "JSON";
+}
+
+.markdown-rendered pre.language-yaml {
+    --code-lang-label: "YAML";
+}
+
+.markdown-rendered pre.language-javascript {
+    --code-lang-label: "JavaScript";
+}
+
+.markdown-rendered pre.language-js {
+    --code-lang-label: "JavaScript";
+}
+
+.markdown-rendered pre.language-typescript {
+    --code-lang-label: "TypeScript";
+}
+
+.markdown-rendered pre.language-ts {
+    --code-lang-label: "TypeScript";
+}
+
+.markdown-rendered pre.language-java {
+    --code-lang-label: "Java";
+}
+
+.markdown-rendered pre.language-sql {
+    --code-lang-label: "SQL";
+}
+
+.markdown-rendered pre.language-html {
+    --code-lang-label: "HTML";
+}
+
+.markdown-rendered pre.language-css {
+    --code-lang-label: "CSS";
+}
+
+.markdown-rendered pre.language-matlab {
+    --code-lang-label: "MATLAB";
+}
+
+.markdown-rendered pre.language-cmake {
+    --code-lang-label: "CMake";
+}
+
+.markdown-rendered pre.language-plain,
+.markdown-rendered pre.language-Plain,
+.markdown-rendered pre.language-plaintext,
+.markdown-rendered pre.language-text,
+.markdown-rendered pre.language-txt {
+    --code-lang-label: "PLAIN TEXT";
+}
+/* ============================================================
+   Code Title Fence：标题与代码块无缝连接
+   ============================================================ */
+
+.markdown-rendered .ctf-code-block {
+    margin: 1em 0 !important;
+}
+
+
+/* 标题下方的代码块取消自身外边距 */
+.markdown-rendered .ctf-code-block > pre {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+}
+
+
+/* 标题底部不要圆角 */
+.markdown-rendered .ctf-code-block > .ctf-code-title {
+    margin-bottom: 0 !important;
+
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+/* ============================================================
+   代码块语言标签映射
+   ============================================================ */
+
+
+/* =========================
+   C / C++ / C#
+   ========================= */
+
+.markdown-rendered pre.language-c {
+    --code-lang-label: "C";
+}
+
+.markdown-rendered pre.language-cpp,
+.markdown-rendered pre.language-cxx,
+.markdown-rendered pre.language-cc {
+    --code-lang-label: "C++";
+}
+
+.markdown-rendered pre.language-csharp,
+.markdown-rendered pre.language-cs {
+    --code-lang-label: "C#";
+}
+
+
+/* =========================
+   Python
+   ========================= */
+
+.markdown-rendered pre.language-python,
+.markdown-rendered pre.language-py {
+    --code-lang-label: "Python";
+}
+
+
+/* =========================
+   Java / JVM
+   ========================= */
+
+.markdown-rendered pre.language-java {
+    --code-lang-label: "Java";
+}
+
+.markdown-rendered pre.language-kotlin,
+.markdown-rendered pre.language-kt {
+    --code-lang-label: "Kotlin";
+}
+
+.markdown-rendered pre.language-scala {
+    --code-lang-label: "Scala";
+}
+
+.markdown-rendered pre.language-groovy {
+    --code-lang-label: "Groovy";
+}
+
+
+/* =========================
+   JavaScript / TypeScript
+   ========================= */
+
+.markdown-rendered pre.language-javascript,
+.markdown-rendered pre.language-js {
+    --code-lang-label: "JavaScript";
+}
+
+.markdown-rendered pre.language-typescript,
+.markdown-rendered pre.language-ts {
+    --code-lang-label: "TypeScript";
+}
+
+.markdown-rendered pre.language-jsx {
+    --code-lang-label: "JSX";
+}
+
+.markdown-rendered pre.language-tsx {
+    --code-lang-label: "TSX";
+}
+
+.markdown-rendered pre.language-node,
+.markdown-rendered pre.language-nodejs {
+    --code-lang-label: "Node.js";
+}
+
+
+/* =========================
+   Web
+   ========================= */
+
+.markdown-rendered pre.language-html,
+.markdown-rendered pre.language-markup {
+    --code-lang-label: "HTML";
+}
+
+.markdown-rendered pre.language-xml {
+    --code-lang-label: "XML";
+}
+
+.markdown-rendered pre.language-css {
+    --code-lang-label: "CSS";
+}
+
+.markdown-rendered pre.language-scss {
+    --code-lang-label: "SCSS";
+}
+
+.markdown-rendered pre.language-sass {
+    --code-lang-label: "Sass";
+}
+
+.markdown-rendered pre.language-less {
+    --code-lang-label: "Less";
+}
+
+.markdown-rendered pre.language-vue {
+    --code-lang-label: "Vue";
+}
+
+.markdown-rendered pre.language-svelte {
+    --code-lang-label: "Svelte";
+}
+
+
+/* =========================
+   Go / Rust / Swift / Dart
+   ========================= */
+
+.markdown-rendered pre.language-go,
+.markdown-rendered pre.language-golang {
+    --code-lang-label: "Go";
+}
+
+.markdown-rendered pre.language-rust,
+.markdown-rendered pre.language-rs {
+    --code-lang-label: "Rust";
+}
+
+.markdown-rendered pre.language-swift {
+    --code-lang-label: "Swift";
+}
+
+.markdown-rendered pre.language-dart {
+    --code-lang-label: "Dart";
+}
+
+
+/* =========================
+   PHP / Ruby / Perl / Lua
+   ========================= */
+
+.markdown-rendered pre.language-php {
+    --code-lang-label: "PHP";
+}
+
+.markdown-rendered pre.language-ruby,
+.markdown-rendered pre.language-rb {
+    --code-lang-label: "Ruby";
+}
+
+.markdown-rendered pre.language-perl {
+    --code-lang-label: "Perl";
+}
+
+.markdown-rendered pre.language-lua {
+    --code-lang-label: "Lua";
+}
+
+
+/* =========================
+   Shell / Linux / Windows
+   ========================= */
+
+.markdown-rendered pre.language-bash {
+    --code-lang-label: "Bash";
+}
+
+.markdown-rendered pre.language-sh,
+.markdown-rendered pre.language-shell {
+    --code-lang-label: "Shell";
+}
+
+.markdown-rendered pre.language-zsh {
+    --code-lang-label: "Zsh";
+}
+
+.markdown-rendered pre.language-fish {
+    --code-lang-label: "Fish";
+}
+
+.markdown-rendered pre.language-powershell,
+.markdown-rendered pre.language-ps1 {
+    --code-lang-label: "PowerShell";
+}
+
+.markdown-rendered pre.language-bat,
+.markdown-rendered pre.language-batch {
+    --code-lang-label: "Batch";
+}
+
+.markdown-rendered pre.language-cmd {
+    --code-lang-label: "CMD";
+}
+
+
+/* =========================
+   数据库
+   ========================= */
+
+.markdown-rendered pre.language-sql {
+    --code-lang-label: "SQL";
+}
+
+.markdown-rendered pre.language-mysql {
+    --code-lang-label: "MySQL";
+}
+
+.markdown-rendered pre.language-postgresql,
+.markdown-rendered pre.language-postgres {
+    --code-lang-label: "PostgreSQL";
+}
+
+.markdown-rendered pre.language-sqlite {
+    --code-lang-label: "SQLite";
+}
+
+.markdown-rendered pre.language-plsql {
+    --code-lang-label: "PL/SQL";
+}
+
+
+/* =========================
+   JSON / YAML / TOML / INI
+   ========================= */
+
+.markdown-rendered pre.language-json {
+    --code-lang-label: "JSON";
+}
+
+.markdown-rendered pre.language-json5 {
+    --code-lang-label: "JSON5";
+}
+
+.markdown-rendered pre.language-yaml,
+.markdown-rendered pre.language-yml {
+    --code-lang-label: "YAML";
+}
+
+.markdown-rendered pre.language-toml {
+    --code-lang-label: "TOML";
+}
+
+.markdown-rendered pre.language-ini {
+    --code-lang-label: "INI";
+}
+
+.markdown-rendered pre.language-conf,
+.markdown-rendered pre.language-config {
+    --code-lang-label: "CONFIG";
+}
+
+.markdown-rendered pre.language-properties {
+    --code-lang-label: "Properties";
+}
+
+.markdown-rendered pre.language-env,
+.markdown-rendered pre.language-dotenv {
+    --code-lang-label: ".env";
+}
+
+
+/* =========================
+   Markdown / 文档
+   ========================= */
+
+.markdown-rendered pre.language-markdown,
+.markdown-rendered pre.language-md {
+    --code-lang-label: "Markdown";
+}
+
+.markdown-rendered pre.language-latex,
+.markdown-rendered pre.language-tex {
+    --code-lang-label: "LaTeX";
+}
+
+.markdown-rendered pre.language-rst {
+    --code-lang-label: "reStructuredText";
+}
+
+.markdown-rendered pre.language-asciidoc {
+    --code-lang-label: "AsciiDoc";
+}
+
+
+/* =========================
+   Docker / DevOps
+   ========================= */
+
+.markdown-rendered pre.language-docker,
+.markdown-rendered pre.language-dockerfile {
+    --code-lang-label: "Dockerfile";
+}
+
+.markdown-rendered pre.language-nginx {
+    --code-lang-label: "Nginx";
+}
+
+.markdown-rendered pre.language-apache {
+    --code-lang-label: "Apache";
+}
+
+.markdown-rendered pre.language-terraform,
+.markdown-rendered pre.language-tf {
+    --code-lang-label: "Terraform";
+}
+
+.markdown-rendered pre.language-hcl {
+    --code-lang-label: "HCL";
+}
+
+.markdown-rendered pre.language-ansible {
+    --code-lang-label: "Ansible";
+}
+
+
+/* =========================
+   构建系统
+   ========================= */
+
+.markdown-rendered pre.language-cmake {
+    --code-lang-label: "CMake";
+}
+
+.markdown-rendered pre.language-make,
+.markdown-rendered pre.language-makefile {
+    --code-lang-label: "Makefile";
+}
+
+.markdown-rendered pre.language-gradle {
+    --code-lang-label: "Gradle";
+}
+
+
+/* =========================
+   FPGA / RTL / 数字 IC
+   ========================= */
+
+.markdown-rendered pre.language-verilog,
+.markdown-rendered pre.language-v {
+    --code-lang-label: "Verilog";
+}
+
+.markdown-rendered pre.language-systemverilog,
+.markdown-rendered pre.language-sv {
+    --code-lang-label: "SystemVerilog";
+}
+
+.markdown-rendered pre.language-vhdl,
+.markdown-rendered pre.language-vhd {
+    --code-lang-label: "VHDL";
+}
+
+.markdown-rendered pre.language-tcl {
+    --code-lang-label: "Tcl";
+}
+
+.markdown-rendered pre.language-xdc {
+    --code-lang-label: "XDC";
+}
+
+
+/* =========================
+   汇编
+   ========================= */
+
+.markdown-rendered pre.language-asm,
+.markdown-rendered pre.language-assembly {
+    --code-lang-label: "Assembly";
+}
+
+.markdown-rendered pre.language-nasm {
+    --code-lang-label: "NASM";
+}
+
+.markdown-rendered pre.language-armasm {
+    --code-lang-label: "ARM Assembly";
+}
+
+
+/* =========================
+   MATLAB / 科学计算
+   ========================= */
+
+.markdown-rendered pre.language-matlab {
+    --code-lang-label: "MATLAB";
+}
+
+.markdown-rendered pre.language-r {
+    --code-lang-label: "R";
+}
+
+.markdown-rendered pre.language-julia {
+    --code-lang-label: "Julia";
+}
+
+
+/* =========================
+   接口 / 网络 / 数据协议
+   ========================= */
+
+.markdown-rendered pre.language-protobuf,
+.markdown-rendered pre.language-proto {
+    --code-lang-label: "Protobuf";
+}
+
+.markdown-rendered pre.language-graphql {
+    --code-lang-label: "GraphQL";
+}
+
+.markdown-rendered pre.language-http {
+    --code-lang-label: "HTTP";
+}
+
+
+/* =========================
+   其他常用
+   ========================= */
+
+.markdown-rendered pre.language-regex {
+    --code-lang-label: "Regex";
+}
+
+.markdown-rendered pre.language-git {
+    --code-lang-label: "Git";
+}
+
+.markdown-rendered pre.language-diff {
+    --code-lang-label: "Diff";
+}
+
+.markdown-rendered pre.language-plain,
+.markdown-rendered pre.language-Plain,
+.markdown-rendered pre.language-text,
+.markdown-rendered pre.language-txt,
+.markdown-rendered pre.language-plaintext {
+    --code-lang-label: "PLAIN TEXT";
+}
+/* ============================================================
+   代码缩进 / 格式保持
+   ============================================================ */
+
+/* 阅读视图 */
+.markdown-rendered pre,
+.markdown-rendered pre code {
+    tab-size: 4 !important;
+    -moz-tab-size: 4 !important;
+
+    white-space: pre !important;
+
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+}
+
+
+/* Live Preview 编辑视图 */
+.markdown-source-view.mod-cm6
+.cm-line.HyperMD-codeblock {
+
+    tab-size: 4 !important;
+    -moz-tab-size: 4 !important;
+
+    white-space: pre !important;
+
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+}

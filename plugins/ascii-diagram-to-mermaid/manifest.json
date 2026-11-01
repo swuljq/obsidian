@@ -1,0 +1,9 @@
+{
+  "id": "ascii-diagram-to-mermaid",
+  "name": "ASCII Diagram to Mermaid",
+  "version": "1.0.16",
+  "minAppVersion": "1.5.0",
+  "description": "Convert Plain/Text ASCII diagrams to Mermaid with OpenCode.",
+  "author": "OpenAI",
+  "isDesktopOnly": true
+}

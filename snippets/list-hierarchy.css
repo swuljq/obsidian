@@ -1,0 +1,363 @@
+/*
+ * ============================================================
+ * Obsidian List Hierarchy
+ * ============================================================
+ *
+ * 多级有序列表：
+ *
+ * 1. 一级
+ *    1.1 二级
+ *        1.1.1 三级
+ *            1.1.1.1 四级
+ *
+ * 编号字体：Cascadia Code
+ * 正文字体：继承 typography.css
+ *
+ * ============================================================
+ */
+
+
+/* ============================================================
+   01. 基础参数
+   ============================================================ */
+
+body {
+    --hierarchy-number-gap: 0.5em;
+    --hierarchy-item-spacing: 0.18em;
+    --hierarchy-line-height: 1.65;
+}
+
+
+/* ============================================================
+   02. 阅读模式
+   ============================================================ */
+
+
+/* ============================================================
+   列表缩进
+   ============================================================ */
+
+.markdown-rendered ol {
+    counter-reset: hierarchy;
+
+    list-style: none !important;
+
+    margin-top: 0.15em;
+    margin-bottom: 0.15em;
+
+    /* 清除 Obsidian 默认的大缩进 */
+    padding-inline-start: 0 !important;
+    margin-inline-start: 0 !important;
+}
+
+
+/* 一级列表：和正文左侧基本对齐 */
+.markdown-rendered > ol {
+    padding-inline-start: 0 !important;
+}
+
+
+/* 二级及以下：每层只缩进 1.8em */
+.markdown-rendered li > ol {
+    padding-inline-start: 1.8em !important;
+}
+
+/* 每一个 li 计数 +hierarchy */
+.markdown-rendered ol > li {
+    counter-increment: hierarchy;
+
+    position: relative;
+
+    margin-top: var(--hierarchy-item-spacing);
+    margin-bottom: var(--hierarchy-item-spacing);
+
+    line-height: var(--hierarchy-line-height);
+}
+
+
+/* 去掉浏览器原生编号 */
+.markdown-rendered ol > li::marker {
+    content: "";
+}
+
+
+/* 自动生成：
+   1
+   1.1
+   1.1.1
+*/
+.markdown-rendered ol > li::before {
+    content: counters(hierarchy, ".") ".";
+
+    display: inline;
+
+    margin-inline-end: var(--hierarchy-number-gap);
+
+    font-family:
+        "Cascadia Code Local",
+        "Cascadia Code",
+        Consolas,
+        monospace;
+
+    font-weight: 600;
+
+    color: var(--text-muted);
+}
+
+/* 与编号相邻的首段改为行内元素，由浏览器统一对齐文字基线 */
+.markdown-rendered ol > li > p:first-child {
+    display: inline;
+}
+
+
+/* 一级编号稍微突出 */
+.markdown-rendered > ol > li::before {
+    color: var(--text-normal);
+    font-weight: 700;
+}
+
+
+/* 列表内正文不要执行正文的 2em 首行缩进 */
+.markdown-rendered :is(ol, ul) li > p {
+    text-indent: 0 !important;
+}
+
+
+/* ============================================================
+   03. 编辑模式 / Live Preview
+   初始化 6 级计数器
+   ============================================================ */
+
+.markdown-source-view.mod-cm6 .cm-content {
+    counter-reset:
+        hierarchy-l1
+        hierarchy-l2
+        hierarchy-l3
+        hierarchy-l4
+        hierarchy-l5
+        hierarchy-l6;
+}
+
+
+/* ============================================================
+   04. 一级列表
+   ============================================================ */
+
+.markdown-source-view.mod-cm6
+.cm-line.HyperMD-list-line-1:has(.cm-formatting-list-ol) {
+
+    counter-increment: hierarchy-l1;
+
+    counter-reset:
+        hierarchy-l2
+        hierarchy-l3
+        hierarchy-l4
+        hierarchy-l5
+        hierarchy-l6;
+}
+
+
+/* 隐藏 Markdown 原来的 1. */
+.markdown-source-view.mod-cm6
+.cm-line.HyperMD-list-line-1
+.cm-formatting-list-ol {
+
+    font-size: 0 !important;
+}
+
+
+/* 重新生成一级编号 */
+.markdown-source-view.mod-cm6
+.cm-line.HyperMD-list-line-1
+.cm-formatting-list-ol::after {
+
+    content: counter(hierarchy-l1) ".";
+
+    font-size: 16px;
+
+    font-family:
+        "Cascadia Code Local",
+        "Cascadia Code",
+        Consolas,
+        monospace;
+
+    font-weight: 700;
+
+    color: var(--text-normal);
+}
+
+
+/* ============================================================
+   05. 二级列表
+   1.1 / 1.2
+   ============================================================ */
+
+.markdown-source-view.mod-cm6
+.cm-line.HyperMD-list-line-2:has(.cm-formatting-list-ol) {
+
+    counter-increment: hierarchy-l2;
+
+    counter-reset:
+        hierarchy-l3
+        hierarchy-l4
+        hierarchy-l5
+        hierarchy-l6;
+}
+
+
+.markdown-source-view.mod-cm6
+.cm-line.HyperMD-list-line-2
+.cm-formatting-list-ol {
+
+    font-size: 0 !important;
+}
+
+
+.markdown-source-view.mod-cm6
+.cm-line.HyperMD-list-line-2
+.cm-formatting-list-ol::after {
+
+    content:
+        counter(hierarchy-l1)
+        "."
+        counter(hierarchy-l2);
+
+    font-size: 15px;
+
+    font-family:
+        "Cascadia Code Local",
+        "Cascadia Code",
+        Consolas,
+        monospace;
+
+    font-weight: 600;
+
+    color: var(--text-muted);
+}
+
+
+/* ============================================================
+   06. 三级列表
+   1.1.1
+   ============================================================ */
+
+.markdown-source-view.mod-cm6
+.cm-line.HyperMD-list-line-3:has(.cm-formatting-list-ol) {
+
+    counter-increment: hierarchy-l3;
+
+    counter-reset:
+        hierarchy-l4
+        hierarchy-l5
+        hierarchy-l6;
+}
+
+
+.markdown-source-view.mod-cm6
+.cm-line.HyperMD-list-line-3
+.cm-formatting-list-ol {
+
+    font-size: 0 !important;
+}
+
+
+.markdown-source-view.mod-cm6
+.cm-line.HyperMD-list-line-3
+.cm-formatting-list-ol::after {
+
+    content:
+        counter(hierarchy-l1)
+        "."
+        counter(hierarchy-l2)
+        "."
+        counter(hierarchy-l3);
+
+    font-size: 14px;
+
+    font-family:
+        "Cascadia Code Local",
+        "Cascadia Code",
+        Consolas,
+        monospace;
+
+    font-weight: 500;
+
+    color: var(--text-muted);
+}
+
+
+/* ============================================================
+   07. 四级列表
+   1.1.1.1
+   ============================================================ */
+
+.markdown-source-view.mod-cm6
+.cm-line.HyperMD-list-line-4:has(.cm-formatting-list-ol) {
+
+    counter-increment: hierarchy-l4;
+
+    counter-reset:
+        hierarchy-l5
+        hierarchy-l6;
+}
+
+
+.markdown-source-view.mod-cm6
+.cm-line.HyperMD-list-line-4
+.cm-formatting-list-ol {
+
+    font-size: 0 !important;
+}
+
+
+.markdown-source-view.mod-cm6
+.cm-line.HyperMD-list-line-4
+.cm-formatting-list-ol::after {
+
+    content:
+        counter(hierarchy-l1)
+        "."
+        counter(hierarchy-l2)
+        "."
+        counter(hierarchy-l3)
+        "."
+        counter(hierarchy-l4);
+
+    font-size: 14px;
+
+    font-family:
+        "Cascadia Code Local",
+        "Cascadia Code",
+        Consolas,
+        monospace;
+
+    color: var(--text-muted);
+}
+
+
+/* ============================================================
+   08. 编辑模式列表排版
+   ============================================================ */
+
+.markdown-source-view.mod-cm6
+.cm-line.HyperMD-list-line {
+
+    /* 覆盖正文的 2em 首行缩进 */
+    text-indent: 0 !important;
+
+    line-height: var(--hierarchy-line-height);
+
+    padding-top: 0.06em;
+    padding-bottom: 0.06em;
+}
+/* ============================================================
+   子级列表缩进
+   ============================================================ */
+
+.markdown-rendered li > ol {
+    padding-left: 0.8em !important;
+    padding-inline-start: 0.8em !important;
+
+    margin-left: 0 !important;
+    margin-inline-start: 0 !important;
+}

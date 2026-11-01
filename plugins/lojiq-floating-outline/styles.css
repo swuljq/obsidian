@@ -1,0 +1,238 @@
+/* Reserve a real column; note typography remains owned by personal snippets. */
+.lfo-host {
+    position: relative;
+    --lfo-content-gap: 24px;
+}
+
+.lfo-host.lfo-docked > :is(.markdown-reading-view, .markdown-source-view) {
+    margin-inline-start: var(--lfo-pane-width);
+    width: calc(100% - var(--lfo-pane-width));
+    min-width: 0;
+    flex: 0 0 calc(100% - var(--lfo-pane-width));
+}
+
+/* Readable-line-width still limits line length, but must not center it again. */
+@media screen {
+    .lfo-host.lfo-docked > .markdown-reading-view > .markdown-preview-view,
+    .lfo-host.lfo-docked > .markdown-source-view > .cm-editor > .cm-scroller {
+        padding-inline-start: var(--lfo-content-gap);
+    }
+
+    .lfo-host.lfo-docked > .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer,
+    .lfo-host.lfo-docked > .markdown-source-view > .cm-editor > .cm-scroller > .cm-sizer {
+        margin-inline-start: 0 !important;
+        margin-inline-end: auto !important;
+    }
+}
+
+.lfo-outline {
+    --lfo-accent: #0aae65;
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0;
+    bottom: 0;
+    width: var(--lfo-pane-width);
+    z-index: 5;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    padding: 20px 14px 20px 12px;
+    font-family: var(--font-interface);
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--text-normal);
+}
+
+.lfo-outline[hidden],
+.lfo-divider[hidden],
+.lfo-outline .lfo-item[hidden] {
+    display: none !important;
+}
+
+.lfo-divider {
+    position: absolute;
+    inset-inline-start: calc(var(--lfo-pane-width) - 3px);
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    z-index: 6;
+    cursor: col-resize;
+    touch-action: none;
+}
+
+.lfo-divider::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 2px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: var(--background-modifier-border);
+}
+
+.lfo-divider:is(:hover, :focus-visible)::before,
+.lfo-resizing > .lfo-divider::before {
+    width: 2px;
+    background-color: var(--interactive-accent, #0aae65);
+}
+
+.lfo-divider:focus-visible {
+    outline: 1px solid var(--interactive-accent, #0aae65);
+    outline-offset: -1px;
+}
+
+.lfo-resizing,
+.lfo-resizing * {
+    cursor: col-resize !important;
+    user-select: none !important;
+}
+
+.theme-dark .lfo-outline {
+    --lfo-accent: #27cd87;
+}
+
+.lfo-outline > ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.lfo-outline .lfo-item {
+    position: relative;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.lfo-outline .lfo-item::before {
+    content: "";
+    position: absolute;
+    left: calc(9px + var(--lfo-depth) * 12px);
+    top: 24px;
+    bottom: -4px;
+    width: 1px;
+    background-color: var(--lfo-accent);
+    pointer-events: none;
+}
+
+.lfo-outline .lfo-item:last-child::before {
+    bottom: 8px;
+}
+
+.lfo-outline .lfo-heading {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 34px;
+    margin: 0;
+    padding: 5px 22px 5px calc(26px + var(--lfo-depth) * 12px);
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    box-shadow: none;
+    color: inherit;
+    font: inherit;
+    font-weight: 400;
+    text-align: left;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+    text-indent: 0;
+}
+
+.lfo-outline .lfo-heading::before {
+    content: "";
+    position: absolute;
+    left: calc(5px + var(--lfo-depth) * 12px);
+    top: 13px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background-color: var(--lfo-accent);
+    pointer-events: none;
+}
+
+.lfo-outline .lfo-has-children > .lfo-heading::before {
+    display: none;
+}
+
+.lfo-outline .lfo-fold {
+    position: absolute;
+    left: calc(var(--lfo-depth) * 12px);
+    top: 6px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 22px;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    box-shadow: none;
+    cursor: pointer;
+}
+
+.lfo-outline .lfo-fold::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-right: 2px solid var(--lfo-accent);
+    border-bottom: 2px solid var(--lfo-accent);
+    transform: rotate(45deg);
+}
+
+.lfo-outline .lfo-fold[aria-expanded="false"]::before {
+    transform: rotate(-45deg);
+}
+
+.lfo-outline .lfo-fold:hover {
+    background-color: var(--background-modifier-hover);
+}
+
+.lfo-outline .lfo-fold:focus-visible {
+    outline: 2px solid var(--lfo-accent);
+    outline-offset: -2px;
+}
+
+.lfo-outline .lfo-heading:hover {
+    background-color: var(--background-modifier-hover);
+}
+
+.lfo-outline .lfo-heading:focus-visible {
+    outline: 2px solid var(--lfo-accent);
+    outline-offset: -2px;
+}
+
+.lfo-outline .lfo-heading.is-active {
+    font-weight: 700;
+}
+
+.lfo-outline .lfo-heading.is-active::after {
+    content: "";
+    position: absolute;
+    right: 3px;
+    top: 13px;
+    width: 12px;
+    height: 10px;
+    border-radius: 4px;
+    background-color: var(--lfo-accent);
+    pointer-events: none;
+}
+
+@media print {
+    .lfo-outline,
+    .lfo-divider {
+        display: none !important;
+    }
+
+    .lfo-host.lfo-docked {
+        --lfo-pane-width: 0px !important;
+    }
+}

@@ -1,0 +1,59 @@
+/*
+ * Image Resize Fix v1.1.1
+ * ------------------------------------------------------------
+ * IMPORTANT:
+ * - Do not change .image-wrapper display/layout.
+ * - Only enlarge/style Obsidian's native resize corner.
+ * - Scope everything to Markdown note views.
+ */
+
+.markdown-source-view.mod-cm6 .image-wrapper > .image-resize-corner,
+.markdown-preview-view .image-wrapper > .image-resize-corner,
+.markdown-rendered .image-wrapper > .image-resize-corner {
+    width: 28px !important;
+    height: 28px !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 100 !important;
+    cursor: nwse-resize !important;
+    pointer-events: auto !important;
+    opacity: 0.35 !important;
+    background: transparent !important;
+    border: 0 !important;
+}
+
+.markdown-source-view.mod-cm6 .image-wrapper > .image-resize-corner::after,
+.markdown-preview-view .image-wrapper > .image-resize-corner::after,
+.markdown-rendered .image-wrapper > .image-resize-corner::after {
+    content: "";
+    position: absolute;
+    right: 4px;
+    bottom: 4px;
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid var(--text-muted);
+    border-bottom: 2px solid var(--text-muted);
+    border-radius: 0 0 2px 0;
+    opacity: 0.75;
+    pointer-events: none;
+}
+
+.markdown-source-view.mod-cm6 .image-wrapper:hover > .image-resize-corner,
+.markdown-preview-view .image-wrapper:hover > .image-resize-corner,
+.markdown-rendered .image-wrapper:hover > .image-resize-corner,
+.image-wrapper.irq-resizing > .image-resize-corner {
+    opacity: 1 !important;
+}
+
+.image-wrapper.irq-resizing,
+.image-wrapper.irq-resizing * {
+    user-select: none !important;
+}
+
+/* Keep image-only lines independent from the paragraph's 2em indent.
+ * Do not set text-align here: image-style.css owns image alignment, and
+ * changing it when Obsidian creates .image-wrapper makes the image jump.
+ */
+.markdown-source-view.mod-cm6 .cm-line:has(.image-wrapper) {
+    text-indent: 0 !important;
+}

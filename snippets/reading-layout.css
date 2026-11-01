@@ -24,7 +24,7 @@
     }
 
     .markdown-reading-view > .markdown-preview-view,
-    .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller {
+    .view-content > .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller {
         box-sizing: border-box;
         background-color: var(--reading-canvas-bg);
         padding: var(--reading-canvas-gutter);
@@ -45,10 +45,12 @@
         box-shadow: 0 0 0 1px var(--reading-paper-edge);
     }
 
-    /* Remove the editor's second, narrower line-width cap inside the sheet. */
+    /* Obsidian caps both containers AND individual .cm-line elements at 700px. */
     .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer > .cm-contentContainer,
     .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer > .cm-content,
-    .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer > .cm-contentContainer > .cm-content {
+    .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer > .cm-contentContainer > .cm-content,
+    .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer > .cm-content > .cm-line,
+    .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer > .cm-contentContainer > .cm-content > .cm-line {
         max-width: 100%;
     }
 

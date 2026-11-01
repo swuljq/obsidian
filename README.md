@@ -78,6 +78,8 @@ node scripts/typography-fonts.test.cjs
 
 插件启用及实际界面显示仍需在 Obsidian 中检查；修改插件 JavaScript 后，
 可以关闭再启用对应插件，或重新加载应用。
+纸张高度的浏览器回归页为 `tests/reading-layout.html`，自动检查浅深色、
+长短笔记及不同面板高度；测试保留原生外层的自动高度，避免错误地预设为撑满。
 
 ## 字体资源
 
@@ -97,6 +99,7 @@ node scripts/typography-fonts.test.cjs
 窗口较窄时纸张自动缩小，左右页边距也会收紧；浅深色背景分别适配。
 短笔记的纸张至少铺满可见区域，长笔记随内容延伸，滚到文末后只留
 `--reading-canvas-gutter` 指定的灰色外边距（默认 16px）。
+阅读外层、编辑外层和滚动容器均明确继承笔记面板高度，避免白纸随短文本缩成卡片。
 屏幕视图取消原生的额外半屏底部滚动留白，纸张内部仍保留 28px 页边距。
 参数集中在文件开头的 `--reading-*` 变量中，字体仍由 `typography.css` 控制。
 

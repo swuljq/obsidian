@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<title>Reading layout regression test</title>
+<style>
+  /* Native height relationships: do not give reading-view/editor a fake height. */
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 18px/1.75 sans-serif; --file-line-width: 700px; --file-margins: 32px; }
+  #results { padding: 8px; font: 13px monospace; white-space: pre-wrap; }
+  .view-content { width: 1200px; max-width: 100%; height: 640px; overflow: hidden; }
+  .markdown-reading-view { display: flex; flex-direction: column; }
+  .markdown-preview-view { height: 100%; width: 100%; overflow: auto; padding: var(--file-margins); }
+  .markdown-preview-sizer { width: 100%; max-width: var(--file-line-width); margin-inline: auto; }
+  .markdown-source-view.mod-cm6 { height: 100%; display: flex; flex-direction: column; }
+  .cm-editor { display: flex !important; flex-direction: column; flex: 1 1; min-height: 0; }
+  .cm-scroller { display: flex !important; align-items: flex-start !important; height: 100%; overflow: auto; }
+  .view-content > .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller { padding: var(--file-margins); }
+  .cm-sizer { display: flex; flex-direction: column; align-items: stretch; width: 100%; min-height: 100%; max-width: var(--file-line-width); margin-inline: auto; }
+  .cm-contentContainer { flex: 1 1 auto; display: flex; align-items: stretch; }
+  .cm-content { width: 0; flex-grow: 2; flex-shrink: 1; white-space: pre-wrap; }
+  .markdown-source-view.mod-cm6.is-readable-line-width .cm-line { max-width: var(--file-line-width); }
+</style>
+<link rel="stylesheet" href="../snippets/typography.css">
+<link rel="stylesheet" href="../snippets/reading-layout.css">
+<pre id="results">Running...</pre>
+<div class="view-content" id="reading-pane">
+  <div class="markdown-reading-view">
+    <div class="markdown-preview-view markdown-rendered">
+      <div class="markdown-preview-sizer" id="reading-paper"><p>Short reading note.</p><div id="reading-spacer"></div></div>
+    </div>
+  </div>
+</div>
+<div class="view-content" id="editing-pane">
+  <div class="markdown-source-view mod-cm6 is-readable-line-width">
+    <div class="cm-editor"><div class="cm-scroller">
+      <div class="cm-sizer" id="editing-paper"><div class="cm-contentContainer">
+        <div class="cm-content" contenteditable="true"><div class="cm-line">Short editing note.</div><div id="editing-spacer"></div></div>
+      </div></div>
+    </div></div>
+  </div>
+</div>
+<script>
+  window.layoutTest = (async () => {
+    await document.fonts.ready;
+    const output = document.getElementById('results');
+    const assert = (condition, message) => { if (!condition) throw new Error(message); };
+    const settle = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    let checks = 0;
+    for (const theme of ['', 'theme-dark']) {
+      document.body.className = theme;
+      for (const height of [320, 640, 900]) {
+        for (const long of [false, true]) {
+          for (const mode of ['reading', 'editing']) {
+            const pane = document.getElementById(mode + '-pane');
+            const paper = document.getElementById(mode + '-paper');
+            const scroller = pane.querySelector(mode === 'reading' ? '.markdown-preview-view' : '.cm-scroller');
+            pane.style.height = height + 'px';
+            document.getElementById(mode + '-spacer').style.height = long ? '1500px' : '0px';
+            // Reproduce Obsidian's runtime half-viewport padding, not just static CSS.
+            (mode === 'reading' ? paper : pane.querySelector('.cm-content')).style.paddingBottom = height / 2 + 'px';
+            await settle();
+            assert(Math.abs(scroller.getBoundingClientRect().height - height) < 1, mode + ': viewport shrank to content');
+            assert(paper.getBoundingClientRect().height >= height - 32 - 1, mode + ': short paper did not fill the pane');
+            if (long) assert(paper.getBoundingClientRect().height > 1500, mode + ': long paper was clipped');
+            scroller.scrollTop = scroller.scrollHeight;
+            const gap = pane.getBoundingClientRect().bottom - paper.getBoundingClientRect().bottom;
+            assert(Math.abs(gap - 16) < 1.1, mode + ': expected 16px bottom edge, got ' + gap);
+            checks += 1;
+          }
+        }
+      }
+    }
+    output.textContent = 'PASS ' + checks + ' reading/editor height cases: short/long, light/dark, 320/640/900px panes.';
+    document.documentElement.dataset.result = 'pass';
+    return output.textContent;
+  })().catch(error => {
+    document.getElementById('results').textContent = 'FAIL: ' + error.message;
+    document.documentElement.dataset.result = 'fail';
+    throw error;
+  });
+</script>
+</html>

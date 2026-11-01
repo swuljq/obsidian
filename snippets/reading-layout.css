@@ -16,6 +16,14 @@
         --reading-paper-edge: rgba(55, 65, 81, 0.10);
     }
 
+    /* Percent minimum heights need an unbroken, definite pane-height chain. */
+    .view-content > .markdown-reading-view,
+    .view-content > .markdown-source-view.mod-cm6,
+    .view-content > .markdown-source-view.mod-cm6 > .cm-editor {
+        height: 100%;
+        min-height: 0;
+    }
+
     .theme-dark .markdown-reading-view,
     .theme-dark .markdown-source-view.mod-cm6 {
         --reading-paper-bg: #1e1f22;
@@ -26,6 +34,8 @@
     .markdown-reading-view > .markdown-preview-view,
     .view-content > .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller {
         box-sizing: border-box;
+        height: 100%;
+        min-height: 0;
         background-color: var(--reading-canvas-bg);
         padding: var(--reading-canvas-gutter);
     }
@@ -48,12 +58,6 @@
     /* Reading mode writes half a viewport of bottom padding inline at runtime. */
     .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer {
         padding-bottom: var(--reading-paper-padding-y) !important;
-    }
-
-    /* Fill the scroller's cross axis, but allow a long document to grow. */
-    .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer {
-        align-self: stretch;
-        min-height: min-content;
     }
 
     /* Keep the paper margin, not Obsidian's extra half-screen scroll tail. */

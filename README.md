@@ -72,7 +72,16 @@ git push
 node plugins/lojiq-floating-outline/outline.test.js
 node plugins/schedule-countdown/countdown-core.test.js
 node plugins/schedule-countdown/task-completion.test.js
+node scripts/typography-fonts.test.cjs
 ```
 
 插件启用及实际界面显示仍需在 Obsidian 中检查；修改插件 JavaScript 后，
 可以关闭再启用对应插件，或重新加载应用。
+
+## 字体资源
+
+`typography.css` 末尾的自动生成区内嵌三份字体，只启用该片段即可使用，
+不依赖操作系统安装字体、额外插件或本机绝对路径。
+排版规则位于字体数据之前，可以正常编辑；不要手动编辑内嵌数据。
+替换 `snippets/font.css/fonts/` 中的原始字体后，执行
+`node scripts/build-typography-fonts.cjs` 重新生成，再运行字体测试。

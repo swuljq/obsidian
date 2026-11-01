@@ -45,6 +45,23 @@
         box-shadow: 0 0 0 1px var(--reading-paper-edge);
     }
 
+    /* Reading mode writes half a viewport of bottom padding inline at runtime. */
+    .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer {
+        padding-bottom: var(--reading-paper-padding-y) !important;
+    }
+
+    /* Fill the scroller's cross axis, but allow a long document to grow. */
+    .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer {
+        align-self: stretch;
+        min-height: min-content;
+    }
+
+    /* Keep the paper margin, not Obsidian's extra half-screen scroll tail. */
+    .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer > .cm-content,
+    .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer > .cm-contentContainer > .cm-content {
+        padding-bottom: 0 !important;
+    }
+
     /* Obsidian caps both containers AND individual .cm-line elements at 700px. */
     .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer > .cm-contentContainer,
     .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer > .cm-content,

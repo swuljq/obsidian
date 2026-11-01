@@ -23,6 +23,7 @@ lojiq 的 Obsidian 配置仓库。仓库根目录对应知识库中的 `.obsidia
 `lojiqUI` 只负责软件界面的框架、面板、侧栏、标签页、菜单和设置窗口。
 笔记正文继续由这些 CSS 片段负责：
 
+- `reading-layout`：阅读视图的纸张宽度、页边距和背景。
 - `typography`：字体、标题、正文排版。
 - `code-style`：代码块外观。
 - `content-style`：引用和内容块。
@@ -87,3 +88,14 @@ node scripts/typography-fonts.test.cjs
 标题按现有比例随之缩放，不改变软件界面或大纲字号。
 替换 `snippets/font.css/fonts/` 中的原始字体后，执行
 `node scripts/build-typography-fonts.cjs` 重新生成，再运行字体测试。
+
+## 阅读布局
+
+`reading-layout.css` 提供屏幕上的连续宽版纸张，不是固定尺寸的 A4 页面。
+最大外宽 1040px，左右页边距默认各 32px，上下各 28px，正文最大宽度约 976px。
+窗口较窄时纸张自动缩小，左右页边距也会收紧；浅深色背景分别适配。
+参数集中在文件开头的 `--reading-*` 变量中，字体仍由 `typography.css` 控制。
+
+大纲显示时纸张靠分隔线对齐，由纸张自身提供左侧页边距，避免重复居中或
+累加留白；大纲隐藏时纸张居中。本片段不改动编辑模式、笔记内嵌预览，
+也不设置固定纸张高度、打印样式或 PDF 导出的纸张大小。

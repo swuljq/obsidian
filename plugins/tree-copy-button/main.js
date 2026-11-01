@@ -8,11 +8,11 @@ module.exports = class TreeCopyButtonPlugin extends Plugin {
 
     onload() {
 
-        /* 页面已经存在的 Tree */
+        /* 页面已经存在的 Tree 与普通引用 */
         this.addCopyButtons(document);
 
 
-        /* 监听后续新出现的 Tree */
+        /* 监听后续新出现的 Tree 与普通引用 */
         const observer = new MutationObserver((mutations) => {
 
             for (const mutation of mutations) {
@@ -38,59 +38,69 @@ module.exports = class TreeCopyButtonPlugin extends Plugin {
         /* 插件关闭时停止监听 */
         this.register(() => {
             observer.disconnect();
+            document.querySelectorAll(
+                '.callout[data-callout="tree"] > .tree-copy-button, ' +
+                '.markdown-rendered blockquote > .quote-copy-button'
+            ).forEach(button => button.remove());
         });
     }
 
 
     /* ========================================================
-       给所有 [!tree] 添加复制按钮
+       给所有 [!tree] 与渲染后的普通引用添加复制按钮
        ======================================================== */
 
     addCopyButtons(root) {
 
-        const trees = [];
+        const selector = '.callout[data-callout="tree"], ' +
+            '.markdown-rendered blockquote:not(.callout)';
+        const blocks = [];
 
 
-        /* root 本身就是 Tree */
+        /* root 本身就是目标块 */
         if (
             root instanceof HTMLElement &&
-            root.matches('.callout[data-callout="tree"]')
+            root.matches(selector)
         ) {
-            trees.push(root);
+            blocks.push(root);
         }
 
 
-        /* root 内部存在 Tree */
+        /* root 内部存在目标块 */
         if (root.querySelectorAll) {
 
-            trees.push(
+            blocks.push(
                 ...root.querySelectorAll(
-                    '.callout[data-callout="tree"]'
+                    selector
                 )
             );
         }
 
 
-        for (const tree of trees) {
+        for (const block of blocks) {
+            const isTree = block.matches('.callout[data-callout="tree"]');
+            const buttonClass = isTree ? "tree-copy-button" : "quote-copy-button";
+            const label = isTree ? "复制目录树" : "复制引用内容";
 
             /* 防止重复添加 */
-            if (tree.querySelector(".tree-copy-button")) {
+            if (block.querySelector(`:scope > .${buttonClass}`)) {
                 continue;
             }
 
 
             const button = document.createElement("button");
 
-            button.className = "tree-copy-button";
+            button.className = buttonClass;
+            button.type = "button";
 
             button.setAttribute(
                 "aria-label",
-                "复制目录树"
+                label
             );
 
             button.setAttribute(
                 "title",
-                "复制目录树"
+                label
             );
 
 
@@ -107,7 +117,7 @@ module.exports = class TreeCopyButtonPlugin extends Plugin {
 
 
                     const content =
-                        tree.querySelector(".callout-content");
+                        isTree ? block.querySelector(":scope > .callout-content") : block;
 
                     if (!content) {
                         return;
@@ -115,7 +125,9 @@ module.exports = class TreeCopyButtonPlugin extends Plugin {
 
 
                     const text =
-                        this.getTreeText(content);
+                        isTree ? this.getTreeText(content) : content.innerText
+                            .replace(/\n{3,}/g, "\n\n")
+                            .trim();
 
 
                     try {
@@ -130,6 +142,7 @@ module.exports = class TreeCopyButtonPlugin extends Plugin {
                             "title",
                             "已复制"
                         );
+                        button.setAttribute("aria-label", "已复制");
 
 
                         setTimeout(() => {
@@ -138,8 +151,9 @@ module.exports = class TreeCopyButtonPlugin extends Plugin {
 
                             button.setAttribute(
                                 "title",
-                                "复制目录树"
+                                label
                             );
+                            button.setAttribute("aria-label", label);
 
                         }, 1200);
 
@@ -147,7 +161,7 @@ module.exports = class TreeCopyButtonPlugin extends Plugin {
                     } catch (error) {
 
                         console.error(
-                            "Tree copy failed:",
+                            "Content copy failed:",
                             error
                         );
                     }
@@ -155,7 +169,7 @@ module.exports = class TreeCopyButtonPlugin extends Plugin {
             );
 
 
-            tree.appendChild(button);
+            block.appendChild(button);
         }
     }
 

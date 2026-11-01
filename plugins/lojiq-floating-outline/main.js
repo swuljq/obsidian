@@ -241,6 +241,7 @@ class PaneOutline {
         this.buttons = this.headings.map((heading, index) => {
             const item = document.createElement("li");
             item.className = "lfo-item";
+            item.dataset.depth = depths[index];
             item.style.setProperty("--lfo-depth", depths[index]);
             if (this.headings[index + 1]?.level > heading.level) {
                 item.classList.add("lfo-has-children");

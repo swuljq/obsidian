@@ -1,6 +1,6 @@
 /*
  * Better Tables
- * 仅收紧阅读模式下只读表格的外部留白。
+ * 阅读模式下只读表格整体居中，并收紧外部留白。
  * 单元格排版和操作控件由插件负责，不覆盖嵌套引用或 Callout。
  * 编辑模式保留原生操作留白、增删、拖动和调整尺寸功能。
  */
@@ -8,8 +8,16 @@
 /* Only the owning read-only block's direct frame loses the editing gutter. */
 .markdown-reading-view
 .block-language-table.tk-block.cp-table-readonly > .cp-table-scroll {
+    display: flex;
     margin: 0 !important;
     padding: 0 !important;
+}
+
+/* Auto margins center small tables and collapse to zero for scrollable wide tables. */
+.markdown-reading-view
+.block-language-table.tk-block.cp-table-readonly > .cp-table-scroll > .cp-table-root {
+    flex: 0 0 auto;
+    margin-inline: auto;
 }
 
 /* Keep the original compact block spacing without changing table geometry. */

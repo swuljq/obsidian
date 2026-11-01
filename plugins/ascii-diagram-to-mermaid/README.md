@@ -1,4 +1,4 @@
-# ASCII Diagram to Mermaid v1.1.0
+# ASCII Diagram to Mermaid v1.2.0
 
 在阅读视图的 `plain` / `text` / `txt` 代码块右上角点击“转 Mermaid”，直接调用 OpenAI 兼容 API，将当前 ASCII / Unicode 框图转换成 Mermaid 并原地替换代码块。不再依赖 OpenCode、Python 或外部命令行。
 
@@ -22,6 +22,12 @@ API 地址和模型可修改为其他 OpenAI Chat Completions 兼容服务。旧
 - 最长等待 120 秒；超时后恢复按钮并忽略迟到的回答。Obsidian 原生请求不支持取消，服务端可能仍继续处理并计费。
 - 替换前保留原有的位置及内容检查，防止覆盖转换期间发生变化的代码块。
 
+## 手动调整图表大小
+
+鼠标移到正文 Mermaid 图上，右上角显示缩小、百分比、放大、重置和全屏按钮。缩放范围为 20%～100%，每次调整 10%；100% 表示默认自适应尺寸，不是强制铺满正文。缩小后图表等比例居中，正文占用高度同步缩小。窄窗口中仍会自动适配可用宽度。
+
+每张图独立调整，不修改 Mermaid 源码、不调用模型 API。缩放只保留在当前渲染的视图中，重新打开笔记或完整重新渲染后恢复 100%。全屏查看不受正文缩放影响。触屏下工具栏始终可见；打印时隐藏工具栏。
+
 ## 密钥安全
 
 API Key 通过密码框输入，但保存时仍是本机 `data.json` 中的明文，不是加密存储。当前仓库已忽略 `plugins/*/data.json`，不要强制提交、分享或公开同步这个文件。插件不会将 API Key 写入源码，也不会输出原始网络错误、请求头或服务端错误正文。
@@ -29,3 +35,5 @@ API Key 通过密码框输入，但保存时仍是本机 `data.json` 中的明�
 ## 本地测试
 
 在仓库根目录执行 `node --test scripts/ascii-diagram-to-mermaid.test.cjs`。测试使用模拟接口，不读取真实密钥、不请求中转站、不产生 API 费用。
+
+缩放交互测试使用 Playwright 和本机 Microsoft Edge：`node scripts/mermaid-scale.browser.cjs`。如果 Playwright 不在默认模块路径中，可传入模块路径：`node scripts/mermaid-scale.browser.cjs "<playwright 或 playwright-core 模块路径>"`。测试验证真实浏览器中的尺寸、正文占用高度、窄窗口布局、重置、全屏和插件重载，不需要启动 Obsidian。

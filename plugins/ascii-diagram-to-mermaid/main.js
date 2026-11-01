@@ -25,6 +25,7 @@ class AsciiDiagramToMermaidPlugin extends Plugin {
     );
     this.decoratedBlocks = new Set();
     this._mermaidObservers = [];
+    this._mermaidControls = new WeakMap();
 
     this.addSettingTab(new AsciiDiagramSettingTab(this.app, this));
 
@@ -32,7 +33,7 @@ class AsciiDiagramToMermaidPlugin extends Plugin {
       this.decorateCodeBlocks(el, ctx);
     });
 
-    // 持久监听整个文档，捕获 Mermaid SVG 的渲染（异步，PostProcessor 之后才出现）
+    // Mermaid SVG 异步出现，统一监听后添加缩放与全屏工具栏。
     this._startMermaidDomWatcher();
   }
 
@@ -53,12 +54,21 @@ class AsciiDiagramToMermaidPlugin extends Plugin {
       try { obs.disconnect(); } catch (_) {}
     }
     this._mermaidObservers = [];
+    for (const container of document.querySelectorAll(".adm-mermaid-wrap")) {
+      const state = this._mermaidControls?.get(container);
+      if (!state) continue;
+      state.toolbar.remove();
+      state.scale = 100;
+      this._applyMermaidScale(state);
+      container.classList.remove("adm-mermaid-wrap");
+    }
+    this._mermaidControls = new WeakMap();
   }
 
   /**
    * 在 document.body 上挂一个持久 MutationObserver，
    * 监视任何新增的 SVG 节点，若其父容器是 .block-language-mermaid 或 .mermaid，
-   * 则立即处理（解锁宽度 + 注入全屏按钮）。
+   * 则立即处理（解锁宽度并注入缩放及全屏工具栏）。
    * 同时扫描当前已存在的 SVG（处理插件加载时已打开的文件）。
    */
   _startMermaidDomWatcher() {
@@ -88,24 +98,17 @@ class AsciiDiagramToMermaidPlugin extends Plugin {
 
   /** 扫描 root 下已存在的所有 Mermaid SVG 并处理 */
   _processMermaidSvgs(root) {
-    const containers = root.querySelectorAll(
-      ".block-language-mermaid, .mermaid"
-    );
-    for (const container of containers) {
-      const svg = container.querySelector("svg");
-      if (svg) {
-        this._unlockSvgWidth(svg);
-        this._injectFullscreenButton(container, svg);
-      }
+    for (const svg of root.querySelectorAll(".block-language-mermaid svg, .mermaid svg")) {
+      this._tryHandleSvg(svg);
     }
   }
 
   /** 检查 svg 的父容器是否是 Mermaid 块，是则处理 */
   _tryHandleSvg(svg) {
     const container = svg.closest(".block-language-mermaid, .mermaid");
-    if (!container) return;
+    if (!container || svg.parentElement !== container) return;
     this._unlockSvgWidth(svg);
-    this._injectFullscreenButton(container, svg);
+    this._injectMermaidControls(container, svg);
   }
 
   /**
@@ -120,32 +123,79 @@ class AsciiDiagramToMermaidPlugin extends Plugin {
     svg.style.width = "";
   }
 
-  /**
-   * 在 Mermaid 容器右上角注入全屏按钮（每个容器只注入一次）。
-   * 点击后弹出全屏遮罩，SVG 自适应缩放至 90vw/90vh。
-   * 点击遮罩背景或按 Esc 关闭。
-   */
-  _injectFullscreenButton(container, svg) {
-    // 避免重复注入
-    if (container.dataset.admFullscreen === "1") return;
-    container.dataset.admFullscreen = "1";
+  _injectMermaidControls(container, svg) {
+    let state = this._mermaidControls.get(container);
+    if (state?.svg === svg && state.toolbar.parentElement === container) return;
+    if (state && state.toolbar.parentElement === container) {
+      state.svg = svg;
+      delete state.width;
+      this._applyMermaidScale(state);
+      return;
+    }
 
-    // 给容器加 position:relative 的 wrapper class
     container.classList.add("adm-mermaid-wrap");
+    const doc = container.ownerDocument;
+    const toolbar = doc.createElement("div");
+    toolbar.className = "adm-mermaid-toolbar";
+    toolbar.setAttribute("role", "group");
+    toolbar.setAttribute("aria-label", "Mermaid 图表大小");
+    const buttons = {};
+    for (const [action, icon, label] of [
+      ["smaller", "minus", "缩小 Mermaid 图"],
+      ["larger", "plus", "放大 Mermaid 图"],
+      ["reset", "rotate-ccw", "重置 Mermaid 图大小"],
+      ["fullscreen", "expand", "全屏查看 Mermaid 图"],
+    ]) {
+      const button = doc.createElement("button");
+      button.type = "button";
+      button.dataset.action = action;
+      button.setAttribute("aria-label", label);
+      button.title = label;
+      setIcon(button, icon);
+      toolbar.appendChild(button);
+      buttons[action] = button;
+    }
+    const percentage = doc.createElement("span");
+    percentage.className = "adm-scale-percentage";
+    percentage.setAttribute("aria-live", "polite");
+    toolbar.insertBefore(percentage, buttons.larger);
+    container.appendChild(toolbar);
+    state = { svg, toolbar, buttons, percentage, scale: 100 };
+    this._mermaidControls.set(container, state);
+    this._applyMermaidScale(state);
 
-    // 创建全屏按钮
-    const button = document.createElement("button");
-    button.className = "adm-fullscreen-button";
-    button.type = "button";
-    button.setAttribute("aria-label", "全屏查看 Mermaid 图");
-    setIcon(button, "expand");
-    container.appendChild(button);
-
-    this.registerDomEvent(button, "click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      this._openFullscreen(svg);
+    this.registerDomEvent(toolbar, "click", (event) => {
+      const button = event.target.closest("button[data-action]");
+      if (!button || !toolbar.contains(button)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (button.dataset.action === "fullscreen") {
+        this._openFullscreen(state.svg);
+        return;
+      }
+      const action = button.dataset.action;
+      state.scale = action === "reset" ? 100 : Math.max(20, Math.min(100, state.scale + (action === "smaller" ? -10 : 10)));
+      this._applyMermaidScale(state);
     });
+  }
+
+  _applyMermaidScale(state) {
+    const { svg, scale } = state;
+    const width = svg.viewBox?.baseVal?.width || (state.width ||= svg.getBoundingClientRect().width);
+    // An explicit SVG width changes document flow, unlike transform: scale().
+    if (scale < 100 && width > 0) {
+      svg.style.setProperty("--adm-svg-width", `${width}px`);
+      svg.style.setProperty("--adm-svg-scale", String(scale / 100));
+      svg.classList.add("adm-scaled-svg");
+    } else {
+      svg.classList.remove("adm-scaled-svg");
+      svg.style.removeProperty("--adm-svg-width");
+      svg.style.removeProperty("--adm-svg-scale");
+    }
+    state.percentage.textContent = `${scale}%`;
+    state.buttons.smaller.disabled = scale <= 20;
+    state.buttons.larger.disabled = scale >= 100;
+    state.buttons.reset.disabled = scale === 100;
   }
 
   /**

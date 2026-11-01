@@ -1,7 +1,7 @@
 {
   "id": "ascii-diagram-to-mermaid",
   "name": "ASCII Diagram to Mermaid",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "minAppVersion": "1.5.0",
   "description": "Convert Plain/Text ASCII diagrams to Mermaid using an OpenAI-compatible API.",
   "author": "OpenAI",

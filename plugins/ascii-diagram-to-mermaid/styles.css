@@ -36,16 +36,27 @@
   cursor: wait;
 }
 
-/* ── Mermaid 全屏按钮 ─────────────────────────────────────── */
+/* ── Mermaid 缩放与全屏工具栏 ─────────────────────────────── */
 .adm-mermaid-wrap {
   position: relative;
 }
 
-.adm-fullscreen-button {
+.adm-mermaid-toolbar {
   position: absolute;
   top: 6px;
   right: 6px;
   z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px;
+  border-radius: 5px;
+  color: var(--text-muted);
+  background: var(--background-secondary);
+  opacity: 0;
+}
+
+.adm-mermaid-toolbar button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -57,18 +68,41 @@
   color: var(--text-muted);
   background: var(--background-secondary);
   cursor: pointer;
-  opacity: 0;
-  transition: opacity 120ms ease, background-color 120ms ease, color 120ms ease;
+  box-shadow: none;
 }
 
-.adm-mermaid-wrap:hover .adm-fullscreen-button,
-.adm-fullscreen-button:focus-visible {
+.adm-mermaid-wrap:hover .adm-mermaid-toolbar,
+.adm-mermaid-toolbar:focus-within {
   opacity: 1;
 }
 
-.adm-fullscreen-button:hover {
+.adm-mermaid-toolbar button:hover:not(:disabled) {
   color: var(--text-normal);
   background: var(--background-modifier-hover);
+}
+
+.adm-mermaid-toolbar button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.adm-scale-percentage {
+  min-width: 4ch;
+  text-align: center;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (hover: none) {
+  .adm-mermaid-toolbar {
+    opacity: 1;
+  }
+}
+
+@media print {
+  .adm-mermaid-toolbar {
+    display: none;
+  }
 }
 
 /* ── Mermaid 全屏 Modal ───────────────────────────────────── */
@@ -120,4 +154,8 @@
   width: auto !important;
   height: auto !important;
   margin-inline: auto;
+}
+
+.markdown-rendered :is(.block-language-mermaid, .mermaid) > svg.adm-scaled-svg {
+  width: calc(min(100%, var(--adm-svg-width)) * var(--adm-svg-scale)) !important;
 }

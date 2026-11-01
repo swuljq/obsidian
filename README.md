@@ -83,5 +83,7 @@ node scripts/typography-fonts.test.cjs
 `typography.css` 末尾的自动生成区内嵌三份字体，只启用该片段即可使用，
 不依赖操作系统安装字体、额外插件或本机绝对路径。
 排版规则位于字体数据之前，可以正常编辑；不要手动编辑内嵌数据。
+正文基准字号由片段前部的 `--typography-body-size` 控制，默认 18px，
+标题按现有比例随之缩放，不改变软件界面或大纲字号。
 替换 `snippets/font.css/fonts/` 中的原始字体后，执行
 `node scripts/build-typography-fonts.cjs` 重新生成，再运行字体测试。

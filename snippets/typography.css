@@ -50,6 +50,8 @@
 .markdown-reading-view,
 .markdown-source-view.mod-cm6 {
 
+    --typography-body-size: 18px;
+    --font-text-size: var(--typography-body-size);
     --typography-body-line-height: 1.75;
     --line-height-normal: var(--typography-body-line-height);
 
@@ -104,6 +106,7 @@
 
 /* 编辑模式 / Live Preview */
 .markdown-source-view.mod-cm6 .cm-content {
+    font-size: var(--typography-body-size);
     font-family:
         "HarmonyOS Sans SC",
         sans-serif;
@@ -116,6 +119,7 @@
 /* 阅读模式 */
 .markdown-reading-view .markdown-rendered,
 .markdown-reading-view {
+    font-size: var(--typography-body-size);
     font-family:
         "HarmonyOS Sans SC",
         sans-serif;

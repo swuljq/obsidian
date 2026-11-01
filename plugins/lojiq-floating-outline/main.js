@@ -131,8 +131,7 @@ class PaneOutline {
         this.divider.tabIndex = 0;
         this.divider.setAttribute("role", "separator");
         this.divider.setAttribute("aria-orientation", "vertical");
-        this.divider.setAttribute("aria-label", "调整大纲宽度");
-        this.divider.title = "拖动调整大纲宽度；双击恢复默认宽度";
+        this.divider.setAttribute("aria-label", "拖动调整大纲宽度；双击恢复默认宽度");
         host.classList.add("lfo-host");
         host.append(this.nav, this.divider);
 
@@ -287,7 +286,6 @@ class PaneOutline {
             button.className = "lfo-heading";
             button.dataset.index = index;
             button.textContent = heading.title || "无标题";
-            button.title = heading.title;
             button.setAttribute("aria-label", `${heading.level} 级标题：${heading.title || "无标题"}`);
             item.append(button);
             fragment.append(item);
@@ -317,7 +315,6 @@ class PaneOutline {
                 const collapsed = this.collapsed.has(this.keys[index]);
                 fold.setAttribute("aria-expanded", String(!collapsed));
                 fold.setAttribute("aria-label", `${collapsed ? "展开" : "折叠"}：${this.headings[index].title}`);
-                fold.title = collapsed ? "展开子标题" : "折叠子标题";
             }
         }
     }

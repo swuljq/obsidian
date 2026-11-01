@@ -1,7 +1,7 @@
 {
   "id": "lojiq-floating-outline",
   "name": "lojiq Floating Outline",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "minAppVersion": "1.5.0",
   "description": "A resizable in-pane heading tree with collapsible sections and subtle current-section highlighting.",
   "author": "lojiq",

@@ -10,6 +10,9 @@
 .callout[data-callout="tree"] {
     /* 去掉 Obsidian Callout 默认强调色 */
     --callout-color: 120, 120, 120;
+    --tree-indent: 1.5em;
+    --tree-line-height: 1.65;
+    --tree-branch-y: calc(var(--tree-line-height) * 0.5em);
 
     /* 整体 */
     background: var(--background-secondary);
@@ -25,14 +28,14 @@
 }
 
 
-/* 隐藏 tree 标题和图标 */
-.callout[data-callout="tree"] .callout-title {
+/* 非折叠 Tree 隐藏标题；可折叠 Tree 保留展开入口。 */
+.callout[data-callout="tree"]:not(.is-collapsible) > .callout-title {
     display: none;
 }
 
 
 /* 内容区域 */
-.callout[data-callout="tree"] .callout-content {
+.callout[data-callout="tree"] > .callout-content {
     margin: 0;
     padding: 0;
 
@@ -43,18 +46,9 @@
         monospace;
 
     font-size: 0.92em;
-    line-height: 1.65;
+    line-height: var(--tree-line-height);
 
     color: var(--text-normal);
-}
-
-
-/* Tree 内部段落不继承普通正文的首行缩进和两端对齐 */
-.callout[data-callout="tree"] .callout-content p {
-    margin: 0;
-    text-indent: 0 !important;
-    text-align: left !important;
-    text-justify: auto !important;
 }
 
 
@@ -101,6 +95,11 @@
     position: relative;
 }
 
+/* Nested quotes keep the outer quote's size instead of shrinking repeatedly. */
+.markdown-rendered blockquote blockquote {
+    font-size: inherit !important;
+}
+
 
 /* ============================================================
    引用块内部竖线
@@ -128,7 +127,7 @@
    与 Tree 一样紧凑
    ============================================================ */
 
-.markdown-rendered blockquote p {
+.markdown-rendered blockquote > p {
     margin: 0 !important;
     padding: 0 !important;
     text-indent: 0 !important;
@@ -174,7 +173,17 @@
    Tree 列表基础设置
    ------------------------------------------------------------ */
 
-.callout[data-callout="tree"] .callout-content ul {
+/* Stop Tree rules at nested callouts, which keep their own content styles. */
+@scope (.callout[data-callout="tree"]) to (.callout) {
+
+:scope > .callout-content p {
+    margin: 0;
+    text-indent: 0 !important;
+    text-align: left !important;
+    text-justify: auto !important;
+}
+
+:scope > .callout-content ul {
     /* 去掉 Markdown 默认圆点 */
     list-style: none !important;
 
@@ -182,7 +191,7 @@
     margin: 0 !important;
 
     /* 为下一层树枝留下空间 */
-    padding-left: 1.5em !important;
+    padding-inline-start: var(--tree-indent) !important;
 }
 
 
@@ -191,8 +200,8 @@
    不显示左侧树枝
    ------------------------------------------------------------ */
 
-.callout[data-callout="tree"] .callout-content > ul {
-    padding-left: 0 !important;
+:scope > .callout-content > ul {
+    padding-inline-start: 0 !important;
 }
 
 
@@ -200,13 +209,13 @@
    每个节点
    ------------------------------------------------------------ */
 
-.callout[data-callout="tree"] .callout-content li {
+:scope > .callout-content li {
     position: relative;
 
     margin: 0 !important;
     padding: 0 !important;
 
-    line-height: 1.65;
+    line-height: var(--tree-line-height);
 }
 
 
@@ -215,20 +224,25 @@
    │
    ------------------------------------------------------------ */
 
-.callout[data-callout="tree"] .callout-content li > ul {
+:scope > .callout-content li > ul {
     position: relative;
 
-    margin-left: 0.35em !important;
+    margin-inline-start: 0.35em !important;
 }
 
 
-/* 子级 ul 左侧画竖线 */
-.callout[data-callout="tree"] .callout-content li > ul::before {
+/* Disable the native full-height guide; each child draws its own segment. */
+:scope > .callout-content li > ul::before {
+    content: none;
+}
+
+/* 每个子节点绘制一段竖线，最后一项只延伸到第一行中部。 */
+:scope > .callout-content li > ul > li::before {
     content: "";
 
     position: absolute;
 
-    left: 0;
+    inset-inline-start: calc(-1 * var(--tree-indent));
     top: 0;
     bottom: 0;
 
@@ -243,18 +257,18 @@
    ├──
    ------------------------------------------------------------ */
 
-.callout[data-callout="tree"] .callout-content li > ul > li::before {
+:scope > .callout-content li > ul > li::after {
     content: "";
 
     position: absolute;
 
     /* 对准父级竖线 */
-    left: -1.15em;
+    inset-inline-start: calc(-1 * var(--tree-indent));
 
     /* 对准文字中部 */
-    top: 0.82em;
+    top: var(--tree-branch-y);
 
-    width: 0.85em;
+    width: calc(var(--tree-indent) - 0.3em);
     height: 1px;
 
     background: var(--text-faint);
@@ -263,21 +277,12 @@
 
 /* ------------------------------------------------------------
    最后一个节点：
-   遮住下面多余的竖线，形成 └──
+   竖线在横线处结束，形成 └──，无需背景色遮罩
    ------------------------------------------------------------ */
 
-.callout[data-callout="tree"] .callout-content li > ul > li:last-child::after {
-    content: "";
-
-    position: absolute;
-
-    left: -1.16em;
-    top: 0.84em;
-    bottom: 0;
-
-    width: 3px;
-
-    background: var(--background-secondary);
+:scope > .callout-content li > ul > li:last-child::before {
+    bottom: auto;
+    height: var(--tree-branch-y);
 }
 
 
@@ -285,8 +290,13 @@
    防止 Obsidian 默认列表 marker 出现
    ------------------------------------------------------------ */
 
-.callout[data-callout="tree"] li::marker {
+:scope > .callout-content li::marker {
     content: "";
+}
+
+/* Obsidian uses a separate element as well as the native marker. */
+:scope > .callout-content li > .list-bullet {
+    display: none;
 }
 
 
@@ -294,9 +304,11 @@
    列表嵌套不要额外产生上下空白
    ------------------------------------------------------------ */
 
-.callout[data-callout="tree"] .callout-content ul ul {
+:scope > .callout-content ul ul {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
+}
+
 }
 /* ============================================================
    Tree 一键复制按钮
@@ -317,7 +329,7 @@
    复制按钮
    ============================================================ */
 
-.callout[data-callout="tree"] .tree-copy-button {
+.callout[data-callout="tree"] > .tree-copy-button {
     position: absolute;
 
     top: 8px;
@@ -363,7 +375,7 @@
    图标本身
    ============================================================ */
 
-.callout[data-callout="tree"]
+.callout[data-callout="tree"] >
 .tree-copy-button svg {
 
     width: 16px;
@@ -378,7 +390,7 @@
    复制按钮稍微变明显
    ============================================================ */
 
-.callout[data-callout="tree"]:hover
+.callout[data-callout="tree"]:hover >
 .tree-copy-button {
 
     opacity: 0.75;
@@ -389,7 +401,7 @@
    鼠标真正放到复制按钮上
    ============================================================ */
 
-.callout[data-callout="tree"]
+.callout[data-callout="tree"] >
 .tree-copy-button:hover {
 
     opacity: 1;
@@ -405,7 +417,7 @@
    点击按钮时
    ============================================================ */
 
-.callout[data-callout="tree"]
+.callout[data-callout="tree"] >
 .tree-copy-button:active {
 
     transform: scale(0.90);
@@ -416,11 +428,17 @@
    防止 Obsidian 默认 button 样式干扰
    ============================================================ */
 
-.callout[data-callout="tree"]
-.tree-copy-button:focus {
+.callout[data-callout="tree"] >
+.tree-copy-button:focus:not(:focus-visible) {
 
     outline: none;
     box-shadow: none;
+}
+
+.callout[data-callout="tree"] > .tree-copy-button:focus-visible {
+    outline: 2px solid var(--interactive-accent);
+    outline-offset: 2px;
+    opacity: 1;
 }
 
 
@@ -429,7 +447,8 @@
    第一行特别长时，给右边复制按钮留一点空间
    ============================================================ */
 
-.callout[data-callout="tree"] .callout-content {
+.callout[data-callout="tree"] > .callout-content,
+.callout[data-callout="tree"].is-collapsible > .callout-title {
     padding-right: 30px;
 }
 

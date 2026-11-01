@@ -1,9 +1,9 @@
 /*
  * Obsidian Image Style
  *
- * 仅居中独占段落或独占一行的图片，保留图文混排。
- * image-resize-fix 插件负责识别并添加 irq-image-only 标记。
- * 不设置图片宽高，不修改 image-wrapper 的布局或缩放手柄。
+ * 图片始终独占一行并居中，前后文字保持原有对齐。
+ * image-resize-fix 标记纯图片段落，用于清除正文首行缩进。
+ * 不设置 img 宽高，不修改 image-wrapper 的布局或缩放手柄。
  */
 
 /* 阅读模式与 Live Preview：图片独占的段落或编辑行。 */
@@ -14,15 +14,27 @@
     text-indent: 0 !important;
 }
 
-/* 阅读模式：没有段落包装的独立嵌入图片。 */
-.markdown-reading-view .markdown-rendered .image-embed.irq-image-only {
+/* Images break the text flow without centering the surrounding paragraph. */
+:is(.markdown-reading-view, .markdown-source-view.mod-cm6.is-live-preview)
+.markdown-rendered img,
+.markdown-source-view.mod-cm6.is-live-preview .image-embed img {
+    display: block;
+    margin-inline: auto !important;
+}
+
+/* Rendered embeds must also be block-level, not just the IMG inside them. */
+:is(.markdown-reading-view, .markdown-source-view.mod-cm6.is-live-preview)
+.markdown-rendered .image-embed {
     display: block;
     width: fit-content;
     max-width: 100%;
     margin-inline: auto !important;
 }
 
-/* Live Preview 的独立块级图片：保留原生 flex 容器与缩放定位。 */
-.markdown-source-view.mod-cm6.is-live-preview .image-embed.irq-image-only {
+/* Keep native flex internals while making inline editor embeds standalone. */
+.markdown-source-view.mod-cm6.is-live-preview .image-embed {
+    display: flex;
+    width: fit-content;
+    max-width: 100%;
     margin-inline: auto !important;
 }

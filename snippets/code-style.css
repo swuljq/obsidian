@@ -718,6 +718,10 @@ body {
     --code-lang-label: "HTTP";
 }
 
+.markdown-rendered pre.language-url {
+    --code-lang-label: "URL";
+}
+
 
 /* =========================
    其他常用

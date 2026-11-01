@@ -1,9 +1,10 @@
 /*
- * Screen-only reading layout. This is a wide continuous sheet, not fixed A4.
+ * Screen-only reading/editor layout. A wide continuous sheet, not fixed A4.
  * Typography and application chrome remain owned by their respective styles.
  */
 @media screen {
-    .markdown-reading-view {
+    .markdown-reading-view,
+    .markdown-source-view.mod-cm6 {
         /* Edit these values to adjust the sheet, not the text itself. */
         --reading-paper-width: 1040px;
         --reading-paper-padding-x: 32px;
@@ -15,19 +16,22 @@
         --reading-paper-edge: rgba(55, 65, 81, 0.10);
     }
 
-    .theme-dark .markdown-reading-view {
+    .theme-dark .markdown-reading-view,
+    .theme-dark .markdown-source-view.mod-cm6 {
         --reading-paper-bg: #1e1f22;
         --reading-canvas-bg: #15171a;
         --reading-paper-edge: rgba(180, 190, 205, 0.12);
     }
 
-    .markdown-reading-view > .markdown-preview-view {
+    .markdown-reading-view > .markdown-preview-view,
+    .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller {
         box-sizing: border-box;
         background-color: var(--reading-canvas-bg);
         padding: var(--reading-canvas-gutter);
     }
 
-    .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer {
+    .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer,
+    .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer {
         box-sizing: border-box;
         width: 100%;
         max-width: var(--reading-paper-width);
@@ -41,12 +45,21 @@
         box-shadow: 0 0 0 1px var(--reading-paper-edge);
     }
 
+    /* Remove the editor's second, narrower line-width cap inside the sheet. */
+    .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer > .cm-contentContainer,
+    .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer > .cm-content,
+    .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer > .cm-contentContainer > .cm-content {
+        max-width: 100%;
+    }
+
     /* The sheet already provides a left margin: do not add the outline gap twice. */
-    .lfo-host.lfo-docked > .markdown-reading-view > .markdown-preview-view {
+    .lfo-host.lfo-docked > .markdown-reading-view > .markdown-preview-view,
+    .lfo-host.lfo-docked > .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller {
         padding-inline-start: 0 !important;
     }
 
-    .lfo-host.lfo-docked > .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer {
+    .lfo-host.lfo-docked > .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer,
+    .lfo-host.lfo-docked > .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer {
         margin-inline-start: 0 !important;
         margin-inline-end: auto !important;
     }

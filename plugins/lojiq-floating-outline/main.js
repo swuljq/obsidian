@@ -80,6 +80,27 @@ function headingAtLine(headings, line) {
     return headings.length ? index : -1;
 }
 
+function headingAtViewport(headings, rendered, top, lineHint) {
+    let current = null;
+    for (const heading of rendered) {
+        if (heading.top <= top + 48) current = heading;
+    }
+    if (!current) return -1;
+    const candidates = [];
+    for (let index = 0; index < headings.length; index += 1) {
+        if (headings[index].title === current.title && headings[index].level === current.level) candidates.push(index);
+    }
+    if (!candidates.length) return -1;
+    const occurrences = rendered.filter(heading => heading.title === current.title && heading.level === current.level);
+    // Full rendering gives an exact occurrence match, even for identical titles.
+    if (occurrences.length === candidates.length) return candidates[occurrences.indexOf(current)];
+    // Virtualized reading sections may omit earlier occurrences of the same title.
+    if (Number.isFinite(lineHint)) {
+        return candidates.reduce((best, index) => Math.abs(headings[index].line - lineHint) < Math.abs(headings[best].line - lineHint) ? index : best);
+    }
+    return candidates[0];
+}
+
 class PaneOutline {
     constructor(plugin, view, host) {
         this.plugin = plugin;
@@ -117,6 +138,12 @@ class PaneOutline {
 
         this.onScroll = event => {
             if (!this.nav.contains(event.target)) this.schedule();
+        };
+        this.onScrollIntent = event => {
+            if (this.nav.contains(event.target) || this.divider.contains(event.target)) return;
+            if (event.type === "keydown" && !["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(event.key)) return;
+            this.navigationIndex = null;
+            this.schedule();
         };
         this.onResize = () => this.schedule();
         this.onClick = event => {
@@ -182,6 +209,7 @@ class PaneOutline {
         this.divider.addEventListener("keydown", this.onDividerKey);
         this.divider.addEventListener("dblclick", this.onResetWidth);
         host.addEventListener("scroll", this.onScroll, true);
+        for (const type of ["wheel", "touchmove", "pointerdown", "keydown"]) host.addEventListener(type, this.onScrollIntent, { capture: true, passive: true });
         this.win.addEventListener("resize", this.onResize);
         this.win.addEventListener("blur", this.onBlur);
         this.resizeObserver = new this.win.ResizeObserver(() => this.schedule());
@@ -204,6 +232,7 @@ class PaneOutline {
     refresh() {
         if (this.disposed) return;
         const file = this.view.file;
+        if (this.mode !== this.view.getMode()) this.navigationIndex = null;
         if (this.filePath !== file?.path) {
             this.filePath = file?.path;
             this.collapsed.clear();
@@ -224,6 +253,7 @@ class PaneOutline {
     }
 
     render() {
+        this.navigationIndex = null;
         const document = this.host.ownerDocument;
         const fragment = document.createDocumentFragment();
         const depths = headingDepths(this.headings);
@@ -348,9 +378,30 @@ class PaneOutline {
 
     updateActive() {
         if (this.nav.hidden || !this.headings.length) return;
-        // MarkdownView exposes a logical scroll line, including virtualized sections.
+        // A native jump can emit a logical scroll line just before its target.
+        // Keep the clicked entry selected until the next user scroll gesture.
+        if (this.navigationIndex != null) {
+            this.setActive(this.navigationIndex);
+            return;
+        }
         const scroll = this.view.getEphemeralState?.()?.scroll;
-        let index;
+        let index = -1;
+        if (this.view.getMode() === "preview") {
+            const root = this.host.querySelector(".markdown-preview-view");
+            const rendered = [];
+            for (const element of root?.querySelectorAll("h1, h2, h3, h4, h5, h6") || []) {
+                if (element.closest(".markdown-embed")) continue;
+                const rect = element.getBoundingClientRect();
+                if (!rect.height || !rect.width) continue;
+                rendered.push({ title: element.getAttribute("data-heading") || element.textContent, level: Number(element.tagName[1]), top: rect.top });
+            }
+            index = headingAtViewport(this.headings, rendered, root?.getBoundingClientRect().top || 0, scroll);
+        }
+        if (index >= 0) {
+            this.setActive(index);
+            return;
+        }
+        // The logical line is a fallback for unrendered/virtualized sections.
         if (typeof scroll === "number" && Number.isFinite(scroll)) {
             index = headingAtLine(this.headings, scroll);
         } else if (this.view.getMode() === "source" && this.view.editor) {
@@ -360,15 +411,6 @@ class PaneOutline {
             index = headingAtLine(this.headings, pos?.line ?? this.view.editor.getCursor().line);
         } else {
             index = this.activeIndex >= 0 ? this.activeIndex : 0;
-            const root = this.host.querySelector(".markdown-preview-view");
-            const top = root?.getBoundingClientRect().top || this.host.getBoundingClientRect().top;
-            for (const element of root?.querySelectorAll("h1, h2, h3, h4, h5, h6") || []) {
-                if (element.closest(".markdown-embed")) continue;
-                if (element.getBoundingClientRect().top > top + 64) break;
-                const title = element.getAttribute("data-heading") || element.textContent;
-                const match = this.headings.findIndex(heading => heading.level === Number(element.tagName[1]) && heading.title === title);
-                if (match >= 0) index = match;
-            }
         }
         this.setActive(index);
     }
@@ -394,6 +436,7 @@ class PaneOutline {
     jump(index) {
         const heading = this.headings[index];
         if (!heading) return;
+        this.navigationIndex = index;
         if (this.view.getMode() === "source" && this.view.editor) {
             const position = { line: heading.line, ch: 0 };
             this.view.editor.setCursor(position);
@@ -415,6 +458,7 @@ class PaneOutline {
         this.win.removeEventListener("resize", this.onResize);
         this.win.removeEventListener("blur", this.onBlur);
         this.host.removeEventListener("scroll", this.onScroll, true);
+        for (const type of ["wheel", "touchmove", "pointerdown", "keydown"]) this.host.removeEventListener(type, this.onScrollIntent, true);
         this.nav.removeEventListener("click", this.onClick);
         this.divider.removeEventListener("pointerdown", this.onPointerDown);
         this.divider.removeEventListener("pointermove", this.onPointerMove);

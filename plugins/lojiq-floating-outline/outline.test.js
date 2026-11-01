@@ -11,10 +11,10 @@ const sandbox = {
 };
 vm.runInNewContext(
     fs.readFileSync(require.resolve("./main.js"), "utf8") +
-        "\nmodule.exports = {parseHeadings, headingDepths, headingParents, outlineWidth, headingAtLine};",
+        "\nmodule.exports = {parseHeadings, headingDepths, headingParents, outlineWidth, headingAtLine, headingAtViewport};",
     sandbox
 );
-const { parseHeadings, headingDepths, headingParents, outlineWidth, headingAtLine } = sandbox.module.exports;
+const { parseHeadings, headingDepths, headingParents, outlineWidth, headingAtLine, headingAtViewport } = sandbox.module.exports;
 const plain = value => JSON.parse(JSON.stringify(value));
 
 assert.deepEqual(plain(parseHeadings([
@@ -55,4 +55,22 @@ assert.equal(headingAtLine([], 0), -1);
 const duplicate = parseHeadings("## Same\ntext\n## Same");
 assert.equal(headingAtLine(duplicate, 0), 0);
 assert.equal(headingAtLine(duplicate, 2.5), 1);
-console.log("PASS heading parsing, fence exclusions, parent hierarchy, duplicate positions, and resize limits");
+const headings = [
+    { title: "Previous", level: 3, line: 10 },
+    { title: "Target", level: 3, line: 20 },
+    { title: "Next", level: 3, line: 40 },
+];
+assert.equal(headingAtLine(headings, 19.8), 0);
+assert.equal(headingAtViewport(headings, [
+    { title: "Previous", level: 3, top: -100 },
+    { title: "Target", level: 3, top: 24 },
+    { title: "Next", level: 3, top: 400 },
+], 0, 19.8), 1);
+assert.equal(headingAtViewport(headings, [{ title: "Target", level: 3, top: 240 }], 0, 19), -1);
+assert.equal(headingAtViewport(headings, [], 0, 19), -1);
+assert.equal(headingAtViewport(duplicate, [
+    { title: "Same", level: 2, top: -100 },
+    { title: "Same", level: 2, top: 24 },
+], 0, 1.8), 1);
+assert.equal(headingAtViewport(duplicate, [{ title: "Same", level: 2, top: 24 }], 0, 1.8), 1);
+console.log("PASS heading parsing, hierarchy, resize limits, viewport tracking, fractional scroll and duplicate titles");

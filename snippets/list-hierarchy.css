@@ -12,6 +12,14 @@ body {
     --hierarchy-line-height: 1.65;
 }
 
+/* Hide list indentation guides without changing indentation or folding. */
+.markdown-rendered :is(ol, ul),
+.markdown-source-view.mod-cm6 .HyperMD-list-line {
+    --indentation-guide-width: 0;
+    --indentation-guide-color: transparent;
+    --indentation-guide-color-active: transparent;
+}
+
 /* 阅读模式：普通有序列表使用原生 list-item 计数生成层级编号。 */
 .markdown-rendered ol {
     list-style-type: decimal;

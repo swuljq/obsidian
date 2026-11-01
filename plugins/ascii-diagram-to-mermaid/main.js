@@ -6,23 +6,23 @@ const {
   MarkdownView,
   Modal,
   setIcon,
+  requestUrl,
 } = require("obsidian");
 
-const fs = require("fs");
-const os = require("os");
-const path = require("path");
-const { spawn, spawnSync } = require("child_process");
-
 const DEFAULT_SETTINGS = {
-  opencodePath: "",
-  model: "",
+  apiBaseUrl: "https://subapi1.amshymb.com/v1",
+  apiKey: "",
+  apiModel: "gemini-3.8-flash-high",
 };
 
-const PROCESS_TIMEOUT_MS = 120000;
+const REQUEST_TIMEOUT_MS = 120000;
 
 class AsciiDiagramToMermaidPlugin extends Plugin {
   async onload() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    const saved = await this.loadData();
+    this.settings = Object.fromEntries(
+      Object.entries(DEFAULT_SETTINGS).map(([key, value]) => [key, saved?.[key] ?? value])
+    );
     this.decoratedBlocks = new Set();
     this._mermaidObservers = [];
 
@@ -248,7 +248,7 @@ class AsciiDiagramToMermaidPlugin extends Plugin {
     label.textContent = "转换中…";
 
     try {
-      const mermaid = await this.convertWithOpenCode(source);
+      const mermaid = await this.convertWithApi(source);
       await this.replaceFence(file, info.lineStart, info.lineEnd, source, mermaid);
       new Notice("已转换为 Mermaid。");
     } catch (error) {
@@ -261,7 +261,7 @@ class AsciiDiagramToMermaidPlugin extends Plugin {
     }
   }
 
-  buildInstructionFile(diagram) {
+  buildConversionPrompt(diagram) {
     return `ASCII / Unicode diagram to Mermaid conversion task.\n\n` +
       `Follow every rule below.\n` +
       `1. Output exactly one fenced Mermaid code block and nothing else.\n` +
@@ -286,186 +286,83 @@ class AsciiDiagramToMermaidPlugin extends Plugin {
       diagram + `\n`;
   }
 
-  async convertWithOpenCode(diagram) {
-    const exe = this.resolveOpenCodePath();
-    if (!exe) {
-      throw new Error("找不到 OpenCode。请在插件设置中填写 opencode.cmd 的完整路径。");
-    }
+  async convertWithApi(diagram) {
+    const output = await this.requestCompletion(this.buildConversionPrompt(diagram));
+    return this.normalizeMermaidLayout(this.extractMermaid(output));
+  }
 
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "obsidian-ascii-mermaid-"));
-    const taskFile = path.join(tmpDir, "task.txt");
-    fs.writeFileSync(taskFile, this.buildInstructionFile(diagram), "utf8");
-
+  async requestCompletion(prompt) {
+    let baseUrl;
     try {
-      const message =
-        "Read the attached task file and follow it exactly. Output only the requested Mermaid code block.";
-      const args = ["run", message];
-      if (this.settings.model && this.settings.model.trim()) {
-        args.push("--model", this.settings.model.trim());
-      }
+      baseUrl = new URL(this.settings.apiBaseUrl.trim());
+    } catch (_) {
+      throw new Error("请在插件设置中填写有效的 API 地址。");
+    }
+    if (baseUrl.protocol !== "https:" || baseUrl.username || baseUrl.password || baseUrl.search || baseUrl.hash) {
+      throw new Error("API 地址必须使用 HTTPS，且不能包含账号、查询参数或片段。");
+    }
+    const apiKey = this.settings.apiKey.trim();
+    const model = this.settings.apiModel.trim();
+    if (!apiKey) throw new Error("请先在插件设置中填写 API Key。");
+    if (!model) throw new Error("请先在插件设置中填写模型名称。");
 
-      // --file accepts multiple values, so positional messages must come first.
-      args.push("--file", taskFile);
-
-      const stdout = await this.runProcess(exe, args);
-      return this.normalizeMermaidLayout(this.extractMermaid(stdout));
+    let timer;
+    let response;
+    try {
+      response = await Promise.race([
+        // Obsidian's native request API avoids browser CORS restrictions.
+        Promise.resolve().then(() => requestUrl({
+          url: `${baseUrl.href.replace(/\/+$/, "")}/chat/completions`,
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model,
+            messages: [{ role: "user", content: prompt }],
+            temperature: 0.2,
+            max_tokens: 4096,
+            stream: false,
+          }),
+          throw: false,
+        })).catch(() => {
+          // Never log transport errors which may include authorization headers.
+          throw new Error("无法连接 API，请检查网络和 API 地址。");
+        }),
+        new Promise((_, reject) => {
+          timer = setTimeout(() => reject(new Error("API 请求超过 120 秒，已停止等待；原始代码块未修改。")), REQUEST_TIMEOUT_MS);
+        }),
+      ]);
     } finally {
-      try {
-        fs.rmSync(tmpDir, { recursive: true, force: true });
-      } catch (_) {}
-    }
-  }
-
-  runProcess(exe, args) {
-    return new Promise((resolve, reject) => {
-      let child;
-
-      const cwd = this.app.vault.adapter.getBasePath?.() || process.cwd();
-
-      if (process.platform === "win32" && /\.(cmd|bat)$/i.test(exe)) {
-        /*
-         * npm global commands on Windows are usually .cmd wrappers.
-         * Do NOT build a quoted `cmd.exe /c` command line here: cmd.exe's
-         * quote rules are easy to break (especially when the executable is
-         * already quoted in settings), and its localized error output can be
-         * decoded as mojibake.
-         *
-         * Instead, pass both the executable path and argv through environment
-         * variables and let PowerShell invoke the .cmd file with the call
-         * operator.  This preserves paths containing spaces and Unicode text.
-         */
-        const shell = this.findPowerShell();
-        if (!shell) {
-          reject(new Error("找不到 PowerShell，无法在 Windows 中启动 opencode.cmd。"));
-          return;
-        }
-
-        const env = {
-          ...process.env,
-          ADM_OPENCODE_EXE: exe,
-          ADM_OPENCODE_ARGS_JSON: JSON.stringify(args),
-        };
-
-        const psScript = [
-          "$ErrorActionPreference = 'Stop'",
-          "try { & \"$env:SystemRoot\\System32\\chcp.com\" 65001 | Out-Null } catch {}",
-          "[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)",
-          "$OutputEncoding = [System.Text.UTF8Encoding]::new($false)",
-          "$exe = $env:ADM_OPENCODE_EXE",
-          "$argv = @((ConvertFrom-Json -InputObject $env:ADM_OPENCODE_ARGS_JSON))",
-          "& $exe @argv",
-          "if ($null -ne $LASTEXITCODE) { exit $LASTEXITCODE }",
-        ].join("; ");
-
-        child = spawn(shell, [
-          "-NoLogo",
-          "-NoProfile",
-          "-NonInteractive",
-          "-ExecutionPolicy",
-          "Bypass",
-          "-Command",
-          psScript,
-        ], {
-          windowsHide: true,
-          cwd,
-          env,
-          stdio: ["ignore", "pipe", "pipe"],
-        });
-      } else {
-        child = spawn(exe, args, {
-          windowsHide: true,
-          cwd,
-          env: process.env,
-          stdio: ["ignore", "pipe", "pipe"],
-        });
-      }
-
-      let stdout = "";
-      let stderr = "";
-      let settled = false;
-
-      const timeout = setTimeout(() => {
-        if (settled) return;
-        settled = true;
-        this.terminateProcess(child);
-        reject(new Error("OpenCode 转换超过 120 秒，已终止。请检查模型配置或网络连接。"));
-      }, PROCESS_TIMEOUT_MS);
-
-      child.stdout?.on("data", (d) => (stdout += d.toString("utf8")));
-      child.stderr?.on("data", (d) => (stderr += d.toString("utf8")));
-
-      child.on("error", (err) => {
-        if (settled) return;
-        settled = true;
-        clearTimeout(timeout);
-        reject(err);
-      });
-      child.on("close", (code) => {
-        if (settled) return;
-        settled = true;
-        clearTimeout(timeout);
-        const cleanStdout = this.cleanProcessOutput(stdout);
-        const cleanStderr = this.cleanProcessOutput(stderr);
-        if (code === 0) {
-          resolve(cleanStdout);
-        } else {
-          const detail = cleanStderr || cleanStdout || `OpenCode exited with code ${code}`;
-          reject(new Error(detail));
-        }
-      });
-    });
-  }
-
-  terminateProcess(child) {
-    if (!child || child.killed) return;
-
-    if (process.platform === "win32" && child.pid) {
-      const killer = spawn("taskkill.exe", ["/pid", String(child.pid), "/t", "/f"], {
-        windowsHide: true,
-        stdio: "ignore",
-      });
-      killer.on("error", () => child.kill());
-      return;
+      clearTimeout(timer);
     }
 
-    child.kill();
-  }
-
-  cleanProcessOutput(output) {
-    return String(output || "")
-      .replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, "")
-      .replace(/\x1B[@-_]/g, "")
-      .trim();
-  }
-
-  findPowerShell() {
-    if (process.platform !== "win32") return null;
-
-    for (const command of ["pwsh.exe", "powershell.exe"]) {
-      try {
-        const res = spawnSync("where.exe", [command], {
-          encoding: "utf8",
-          windowsHide: true,
-        });
-        if (res.status === 0) {
-          const first = (res.stdout || "")
-            .split(/\r?\n/)
-            .map((x) => x.trim())
-            .find(Boolean);
-          if (first) return first;
-        }
-      } catch (_) {}
+    if (response.status < 200 || response.status >= 300) {
+      const hints = {
+        401: "API Key 无效或已过期",
+        403: "无权访问该模型或接口",
+        404: "请检查 API 地址和模型名称",
+        429: "请求限流或额度不足，请稍后重试或检查额度",
+      };
+      throw new Error(`API 请求失败（HTTP ${response.status}）：${hints[response.status] || "中转站服务异常，请稍后重试"}。`);
     }
 
-    // Windows PowerShell is present on normal Windows 10/11 installs.
-    const fallback = path.join(
-      process.env.SystemRoot || "C:\\Windows",
-      "System32",
-      "WindowsPowerShell",
-      "v1.0",
-      "powershell.exe"
-    );
-    return fs.existsSync(fallback) ? fallback : null;
+    let result;
+    try {
+      result = response.json;
+    } catch (_) {
+      throw new Error("API 返回的不是有效 JSON，请检查中转站接口。");
+    }
+    const choice = result?.choices?.[0];
+    if (choice?.finish_reason === "length") {
+      throw new Error("模型输出达到长度限制，已取消替换，请缩小框图后重试。");
+    }
+    const content = choice?.message?.content;
+    if (typeof content !== "string" || !content.trim()) {
+      throw new Error("API 未返回有效的回答内容，请检查模型和接口兼容性。");
+    }
+    return content.trim();
   }
 
   extractMermaid(output) {
@@ -480,7 +377,7 @@ class AsciiDiagramToMermaidPlugin extends Plugin {
       return `\`\`\`mermaid\n${body}\n\`\`\``;
     }
 
-    throw new Error("OpenCode 已返回结果，但没有检测到 Mermaid 代码。");
+    throw new Error("模型已返回结果，但没有检测到 Mermaid 代码。");
   }
 
   normalizeMermaidLayout(mermaid) {
@@ -622,75 +519,12 @@ class AsciiDiagramToMermaidPlugin extends Plugin {
     await this.app.vault.modify(file, newLines.join("\n"));
   }
 
-  normalizeConfiguredPath(value) {
-    let v = String(value || "").trim();
-
-    // Users often paste a path as "C:\\...\\opencode.cmd".  Quotes are
-    // display syntax, not part of the real file name, so strip one matching
-    // outer pair before fs.existsSync / process launch.
-    if (v.length >= 2) {
-      const first = v[0];
-      const last = v[v.length - 1];
-      if ((first === '"' && last === '"') || (first === "'" && last === "'")) {
-        v = v.slice(1, -1).trim();
-      }
-    }
-
-    return v;
-  }
-
-  resolveOpenCodePath() {
-    const configured = this.normalizeConfiguredPath(this.settings.opencodePath || "");
-    if (configured) {
-      if (fs.existsSync(configured)) return configured;
-      // Also allow a command name instead of a full path.
-      if (!/[\\/]/.test(configured)) {
-        const found = this.findCommand(configured);
-        if (found) return found;
-      }
-    }
-
-    return this.findCommand(process.platform === "win32" ? "opencode.cmd" : "opencode") ||
-      this.findCommand("opencode");
-  }
-
-  findCommand(command) {
+  async testConnection() {
     try {
-      if (process.platform === "win32") {
-        const res = spawnSync("where.exe", [command], {
-          encoding: "utf8",
-          windowsHide: true,
-        });
-        if (res.status === 0) {
-          const first = (res.stdout || "")
-            .split(/\r?\n/)
-            .map((x) => x.trim())
-            .find(Boolean);
-          if (first) return first;
-        }
-      } else {
-        const res = spawnSync("which", [command], { encoding: "utf8" });
-        if (res.status === 0) return (res.stdout || "").trim() || null;
-      }
-    } catch (_) {}
-    return null;
-  }
-
-  async testOpenCode() {
-    const exe = this.resolveOpenCodePath();
-    if (!exe) {
-      new Notice("未找到 OpenCode。请填写完整路径。", 5000);
-      return;
-    }
-
-    try {
-      const output = await this.runProcess(exe, ["--version"]);
-      const firstLine = (output || "").split(/\r?\n/).find(Boolean) || "可正常启动";
-      new Notice(`OpenCode 正常：${firstLine}`, 6000);
+      await this.requestCompletion("Reply with OK only.");
+      new Notice("API 连接正常，模型已成功返回回答。", 6000);
     } catch (error) {
-      console.error("[ASCII Diagram to Mermaid] OpenCode test failed", error);
-      const msg = error instanceof Error ? error.message : String(error);
-      new Notice(`OpenCode 启动失败：${msg}`, 8000);
+      new Notice(`API 测试失败：${error.message}`, 8000);
     }
   }
 
@@ -707,36 +541,57 @@ class AsciiDiagramSettingTab extends PluginSettingTab {
     containerEl.empty();
 
     new Setting(containerEl)
-      .setName("OpenCode 路径")
-      .setDesc("可留空自动查找；Windows 也可填写 opencode.cmd 的完整路径。")
+      .setName("API 地址")
+      .setDesc("OpenAI 兼容接口的基础地址，包含 /v1，不包含 /chat/completions。转换时仅发送当前框图。")
       .addText((text) =>
         text
-          .setPlaceholder("C:\\Users\\...\\AppData\\Roaming\\npm\\opencode.cmd")
-          .setValue(this.plugin.settings.opencodePath)
+          .setPlaceholder(DEFAULT_SETTINGS.apiBaseUrl)
+          .setValue(this.plugin.settings.apiBaseUrl)
           .onChange(async (value) => {
-            this.plugin.settings.opencodePath = value.trim();
+            this.plugin.settings.apiBaseUrl = value.trim();
             await this.plugin.saveSettings();
           })
       );
+
+    new Setting(containerEl)
+      .setName("API Key")
+      .setDesc("保存在本机插件 data.json 中（明文，已被 Git 忽略）；密码框仅隐藏显示，请勿分享此配置文件。")
+      .addText((text) => {
+        text.inputEl.type = "password";
+        text.inputEl.autocomplete = "off";
+        text.setPlaceholder("填写你的 API Key")
+          .setValue(this.plugin.settings.apiKey)
+          .onChange(async (value) => {
+            this.plugin.settings.apiKey = value.trim();
+            await this.plugin.saveSettings();
+          });
+      });
 
     new Setting(containerEl)
       .setName("模型")
-      .setDesc("可选。留空时使用 OpenCode 当前默认模型；也可填写 provider/model。")
+      .setDesc("填写中转站支持的完整模型名称。")
       .addText((text) =>
         text
-          .setPlaceholder("留空使用默认模型")
-          .setValue(this.plugin.settings.model)
+          .setPlaceholder(DEFAULT_SETTINGS.apiModel)
+          .setValue(this.plugin.settings.apiModel)
           .onChange(async (value) => {
-            this.plugin.settings.model = value.trim();
+            this.plugin.settings.apiModel = value.trim();
             await this.plugin.saveSettings();
           })
       );
 
     new Setting(containerEl)
-      .setName("检测 OpenCode")
-      .setDesc("检查插件当前能够找到的 OpenCode 命令。")
+      .setName("测试连接")
+      .setDesc("发送一次简短的模型请求，会产生少量 API 用量。")
       .addButton((button) =>
-        button.setButtonText("检测").onClick(() => this.plugin.testOpenCode())
+        button.setButtonText("测试连接").onClick(async () => {
+          button.setDisabled(true);
+          try {
+            await this.plugin.testConnection();
+          } finally {
+            button.setDisabled(false);
+          }
+        })
       );
   }
 }

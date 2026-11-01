@@ -6,7 +6,7 @@
  */
 
 /* Only the owning read-only block's direct frame loses the editing gutter. */
-.markdown-reading-view
+:is(.markdown-reading-view, .print)
 .block-language-table.tk-block.cp-table-readonly > .cp-table-scroll {
     display: flex;
     margin: 0 !important;
@@ -14,14 +14,14 @@
 }
 
 /* Auto margins center small tables and collapse to zero for scrollable wide tables. */
-.markdown-reading-view
+:is(.markdown-reading-view, .print)
 .block-language-table.tk-block.cp-table-readonly > .cp-table-scroll > .cp-table-root {
     flex: 0 0 auto;
     margin-inline: auto;
 }
 
 /* Keep the original compact block spacing without changing table geometry. */
-.markdown-reading-view
+:is(.markdown-reading-view, .print)
 .block-language-table.tk-block.cp-table-readonly {
     margin-bottom: 0 !important;
     padding-bottom: 0 !important;

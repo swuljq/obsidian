@@ -1,21 +1,22 @@
 /*
- * Screen-only reading/editor layout. A wide continuous sheet, not fixed A4.
+ * Reading/editor sheet with matching content width for native PDF export.
  * Typography and application chrome remain owned by their respective styles.
  */
-@media screen {
-    .markdown-reading-view,
-    .markdown-source-view.mod-cm6 {
-        /* Edit these values to adjust the sheet, not the text itself. */
-        --reading-paper-width: 1040px;
-        --reading-paper-padding-x: 32px;
-        --reading-paper-padding-y: 28px;
-        --reading-canvas-gutter: 16px;
-        --reading-paper-radius: 8px;
-        --reading-paper-bg: #ffffff;
-        --reading-canvas-bg: #eef0f3;
-        --reading-paper-edge: rgba(55, 65, 81, 0.10);
-    }
+.markdown-reading-view,
+.markdown-source-view.mod-cm6,
+.print {
+    /* Shared dimensions keep screen and export content widths in sync. */
+    --reading-paper-width: 1040px;
+    --reading-paper-padding-x: 32px;
+    --reading-paper-padding-y: 28px;
+    --reading-canvas-gutter: 16px;
+    --reading-paper-radius: 8px;
+    --reading-paper-bg: #ffffff;
+    --reading-canvas-bg: #eef0f3;
+    --reading-paper-edge: rgba(55, 65, 81, 0.10);
+}
 
+@media screen {
     /* Percent minimum heights need an unbroken, definite pane-height chain. */
     .view-content > .markdown-reading-view,
     .view-content > .markdown-source-view.mod-cm6,
@@ -90,5 +91,45 @@
     .lfo-host.lfo-docked > .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer {
         margin-inline-start: 0 !important;
         margin-inline-end: auto !important;
+    }
+}
+
+/* Native export: select A3 portrait, no margins, 100% scale in the PDF dialog. */
+@media print {
+    @page {
+        size: A3 portrait;
+        margin: 28px 0;
+    }
+
+    .print > .markdown-preview-view {
+        display: flow-root;
+        box-sizing: border-box;
+        width: var(--reading-paper-width);
+        max-width: 100%;
+        height: auto !important;
+        min-height: 0;
+        margin: 0 auto;
+        padding: 0 var(--reading-paper-padding-x) !important;
+        overflow: visible !important;
+        background: var(--reading-paper-bg);
+        color: var(--text-normal);
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .print :is(.tree-copy-button, .quote-copy-button, .copy-code-button,
+        .ctf-copy-button, .image-resize-corner, .embed-actions, .edit-block-button) {
+        display: none !important;
+    }
+
+    .print :is(h1, h2, h3, h4, h5, h6) {
+        break-after: avoid;
+    }
+
+    .print :is(img, tr) {
+        break-inside: avoid;
     }
 }

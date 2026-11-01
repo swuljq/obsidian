@@ -48,7 +48,8 @@
    ============================================================ */
 
 .markdown-reading-view,
-.markdown-source-view.mod-cm6 {
+.markdown-source-view.mod-cm6,
+.print {
 
     --typography-body-size: 18px;
     --font-text-size: var(--typography-body-size);
@@ -118,7 +119,9 @@
 
 /* 阅读模式 */
 .markdown-reading-view .markdown-rendered,
-.markdown-reading-view {
+.markdown-reading-view,
+.print .markdown-rendered,
+.print {
     font-size: var(--typography-body-size);
     font-family:
         "HarmonyOS Sans SC",
@@ -137,7 +140,7 @@
 
 /* ---------- 阅读模式 ---------- */
 
-:is(.markdown-reading-view, .markdown-source-view.mod-cm6) .markdown-rendered :is(h1, h2, h3, h4, h5, h6) {
+:is(.markdown-reading-view, .markdown-source-view.mod-cm6, .print) .markdown-rendered :is(h1, h2, h3, h4, h5, h6) {
 
     font-family:
         "HarmonyOS Sans SC",
@@ -169,7 +172,7 @@
  * 这里只保留其“居中”的风格，并采用更适合 Obsidian 的参数。
  */
 
-:is(.markdown-reading-view, .markdown-source-view.mod-cm6) .markdown-rendered h1 {
+:is(.markdown-reading-view, .markdown-source-view.mod-cm6, .print) .markdown-rendered h1 {
     font-size: var(--h1-size);
     line-height: var(--h1-line-height);
 
@@ -199,7 +202,7 @@
    margin: 20px 0
    ============================================================ */
 
-:is(.markdown-reading-view, .markdown-source-view.mod-cm6) .markdown-rendered h2 {
+:is(.markdown-reading-view, .markdown-source-view.mod-cm6, .print) .markdown-rendered h2 {
     font-size: var(--h2-size);
     line-height: var(--h2-line-height);
 
@@ -224,7 +227,7 @@
    margin: 20px 0
    ============================================================ */
 
-:is(.markdown-reading-view, .markdown-source-view.mod-cm6) .markdown-rendered h3 {
+:is(.markdown-reading-view, .markdown-source-view.mod-cm6, .print) .markdown-rendered h3 {
     font-size: var(--h3-size);
     line-height: var(--h3-line-height);
 
@@ -249,7 +252,7 @@
    margin: 20px 0
    ============================================================ */
 
-:is(.markdown-reading-view, .markdown-source-view.mod-cm6) .markdown-rendered h4 {
+:is(.markdown-reading-view, .markdown-source-view.mod-cm6, .print) .markdown-rendered h4 {
     font-size: var(--h4-size);
     line-height: var(--h4-line-height);
 
@@ -274,7 +277,7 @@
    margin: 23px 0
    ============================================================ */
 
-:is(.markdown-reading-view, .markdown-source-view.mod-cm6) .markdown-rendered h5 {
+:is(.markdown-reading-view, .markdown-source-view.mod-cm6, .print) .markdown-rendered h5 {
     font-size: var(--h5-size);
     line-height: var(--h5-line-height);
 
@@ -299,7 +302,7 @@
    margin: 23px 0
    ============================================================ */
 
-:is(.markdown-reading-view, .markdown-source-view.mod-cm6) .markdown-rendered h6 {
+:is(.markdown-reading-view, .markdown-source-view.mod-cm6, .print) .markdown-rendered h6 {
     font-size: var(--h6-size);
     line-height: var(--h6-line-height);
 
@@ -322,7 +325,7 @@
    HarmonyOS Sans SC Bold
    ============================================================ */
 
-:is(.markdown-reading-view, .markdown-source-view.mod-cm6) .markdown-rendered :is(strong, b),
+:is(.markdown-reading-view, .markdown-source-view.mod-cm6, .print) .markdown-rendered :is(strong, b),
 .markdown-source-view.mod-cm6 .cm-strong {
 
     font-family:
@@ -338,7 +341,7 @@
    Cascadia Code
    ============================================================ */
 
-:is(.markdown-reading-view, .markdown-source-view.mod-cm6) .markdown-rendered code,
+:is(.markdown-reading-view, .markdown-source-view.mod-cm6, .print) .markdown-rendered code,
 .markdown-source-view.mod-cm6 .cm-inline-code {
 
     font-family:
@@ -354,7 +357,7 @@
    Cascadia Code
    ============================================================ */
 
-:is(.markdown-reading-view, .markdown-source-view.mod-cm6) .markdown-rendered :is(pre, pre code),
+:is(.markdown-reading-view, .markdown-source-view.mod-cm6, .print) .markdown-rendered :is(pre, pre code),
 .markdown-source-view.mod-cm6 .HyperMD-codeblock {
 
     font-family:
@@ -376,7 +379,7 @@
    ============================================================ */
 
 /* Indentation belongs to prose, not lists, quotes, tables, diagrams or media. */
-:is(.markdown-reading-view, .markdown-source-view.mod-cm6) .markdown-rendered
+:is(.markdown-reading-view, .markdown-source-view.mod-cm6, .print) .markdown-rendered
 p:not(:where(li p, blockquote p, .callout p, td p, th p, foreignObject p,
     .mermaid p, .block-language-mermaid p, .block-language-table p,
     .cp-cell-markdown p, .math p)):not(:has(img, video, audio, iframe, svg, canvas,
@@ -397,7 +400,7 @@ p:not(:where(li p, blockquote p, .callout p, td p, th p, foreignObject p,
 }
 
 /* Mermaid uses HTML paragraphs inside SVG foreignObject labels. */
-:is(.markdown-reading-view, .markdown-source-view.mod-cm6) .markdown-rendered :is(.mermaid, .block-language-mermaid) foreignObject p {
+:is(.markdown-reading-view, .markdown-source-view.mod-cm6, .print) .markdown-rendered :is(.mermaid, .block-language-mermaid) foreignObject p {
     text-indent: 0 !important;
     text-align: center !important;
     text-justify: auto !important;
@@ -408,23 +411,23 @@ p:not(:where(li p, blockquote p, .callout p, td p, th p, foreignObject p,
 }
 
 /* 段落紧跟列表时，消除列表自带的 margin-top，避免间距过大 */
-:is(.markdown-reading-view, .markdown-source-view.mod-cm6) .markdown-rendered p + :is(ul, ol) {
+:is(.markdown-reading-view, .markdown-source-view.mod-cm6, .print) .markdown-rendered p + :is(ul, ol) {
     margin-top: 0 !important;
 }
 
 /* 列表紧跟段落时，消除列表的 margin-bottom，保持紧凑 */
-:is(.markdown-reading-view, .markdown-source-view.mod-cm6) .markdown-rendered :is(ul, ol) + p {
+:is(.markdown-reading-view, .markdown-source-view.mod-cm6, .print) .markdown-rendered :is(ul, ol) + p {
     margin-top: 0 !important;
 }
 
 /* 阅读模式：统一收紧列表自身的上下间距 */
-:is(.markdown-reading-view, .markdown-source-view.mod-cm6) .markdown-rendered :is(ul, ol) {
+:is(.markdown-reading-view, .markdown-source-view.mod-cm6, .print) .markdown-rendered :is(ul, ol) {
     margin-top: 0.2em !important;
     margin-bottom: 0.2em !important;
 }
 
 /* 阅读模式：列表项之间也收紧 */
-:is(.markdown-reading-view, .markdown-source-view.mod-cm6) .markdown-rendered li {
+:is(.markdown-reading-view, .markdown-source-view.mod-cm6, .print) .markdown-rendered li {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
 }

@@ -30,7 +30,7 @@ body {
     margin-inline-start: 0;
 }
 
-:is(.markdown-reading-view, .markdown-source-view.mod-cm6) .markdown-rendered ol > li {
+:is(.markdown-reading-view, .markdown-source-view.mod-cm6, .print) .markdown-rendered ol > li {
     margin-inline-start: var(--hierarchy-list-indent);
     margin-top: var(--hierarchy-item-spacing) !important;
     margin-bottom: var(--hierarchy-item-spacing) !important;

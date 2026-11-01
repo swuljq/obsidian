@@ -434,6 +434,25 @@ p:not(:where(li p, blockquote p, .callout p, td p, th p, foreignObject p,
    02. 编辑模式 / Live Preview
    ============================================================ */
 
+/* A physical source line is not necessarily a new Markdown paragraph. */
+.markdown-source-view.mod-cm6 .cm-content > .cm-line {
+    --typography-line-indent: 0em;
+}
+
+/* A leading .cm-gap belongs to off-screen text, not a document start. */
+.markdown-source-view.mod-cm6 .cm-content > .cm-line:first-child,
+.markdown-source-view.mod-cm6 .cm-content > :is(
+    .cm-line:has(> br:only-child),
+    .HyperMD-header,
+    .HyperMD-codeblock-end,
+    .HyperMD-hr,
+    .HyperMD-table-row,
+    .HyperMD-frontmatter,
+    .cm-embed-block
+) + .cm-line {
+    --typography-line-indent: 2em;
+}
+
 .markdown-source-view.mod-cm6
 .cm-line:not(.HyperMD-header, .HyperMD-list-line, .HyperMD-quote,
     .HyperMD-codeblock, .HyperMD-codeblock-bg, .HyperMD-frontmatter,
@@ -441,8 +460,8 @@ p:not(:where(li p, blockquote p, .callout p, td p, th p, foreignObject p,
     .image-embed, .internal-embed, .cm-embed-block,
     .math-block, .cm-hmd-frontmatter)) {
 
-    /* 首行缩进 */
-    text-indent: 2em !important;
+    /* 只缩进段落首行；一次回车产生的续行不重新缩进。 */
+    text-indent: var(--typography-line-indent, 0em) !important;
 
     /* 两端对齐 */
     text-align: justify !important;

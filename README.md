@@ -81,6 +81,8 @@ node scripts/typography-fonts.test.cjs
 纸张高度的浏览器回归页为 `tests/reading-layout.html`，自动检查浅深色、
 长短笔记及不同面板高度；测试保留原生外层的自动高度，避免错误地预设为撑满。
 同时复现渲染器写入的内联最小高度和虚拟长文档的高度占位。
+段落缩进的浏览器回归页为 `tests/typography-paragraphs.html`，检查段内换行、
+空行分段、块边界、视口占位、合并段落及自动折行时的首行位置。
 
 ## 字体资源
 
@@ -89,6 +91,9 @@ node scripts/typography-fonts.test.cjs
 排版规则位于字体数据之前，可以正常编辑；不要手动编辑内嵌数据。
 正文基准字号由片段前部的 `--typography-body-size` 控制，默认 18px，
 标题按现有比例随之缩放，不改变软件界面或大纲字号。
+普通正文按 Markdown 段落缩进：一次回车是段内续行，不重新缩进；空一行
+形成新段落后再缩进。编辑视图通过空行和明确块边界识别首行，不接管 Enter，
+不往笔记中写入空格或空行。
 替换 `snippets/font.css/fonts/` 中的原始字体后，执行
 `node scripts/build-typography-fonts.cjs` 重新生成，再运行字体测试。
 

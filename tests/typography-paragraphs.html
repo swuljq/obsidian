@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<title>Typography paragraph regression test</title>
+<style>
+  body { font: 18px/1.75 sans-serif; }
+  .cm-content, .markdown-rendered { width: 600px; max-width: 100%; }
+  .cm-line { display: block; white-space: pre-wrap; }
+  #results { white-space: pre-wrap; font: 13px monospace; }
+</style>
+<link rel="stylesheet" href="../snippets/typography.css">
+<pre id="results">Running...</pre>
+<div class="markdown-reading-view"><div class="markdown-rendered">
+  <p id="read-paragraph"><span id="read-first">段落第一行</span><br><span id="read-soft">同一段的下一行</span></p>
+  <p id="read-next"><span id="read-next-text">新段落的第一行</span></p>
+</div></div>
+<div class="markdown-source-view mod-cm6"><div class="cm-content" id="source">
+  <div class="cm-line" id="first"><span id="first-text">段落第一行</span></div>
+  <div class="cm-line" id="soft"><span id="soft-text">同一段的下一行</span></div>
+  <div class="cm-line" id="blank"><br></div>
+  <div class="cm-line" id="next"><span id="next-text">新段落的第一行</span></div>
+  <div class="cm-line HyperMD-header HyperMD-header-2" id="heading">二级标题</div>
+  <div class="cm-line" id="after-heading">标题后的正文</div>
+  <div class="cm-line HyperMD-codeblock HyperMD-codeblock-begin" id="code-open">~~~</div>
+  <div class="cm-line HyperMD-codeblock" id="code-body">code</div>
+  <div class="cm-line HyperMD-codeblock HyperMD-codeblock-end" id="code-end">~~~</div>
+  <div class="cm-line" id="after-code">代码块后的正文</div>
+  <div class="cm-line HyperMD-list-line" id="list">- 列表</div>
+  <div class="cm-line HyperMD-quote" id="quote">&gt; 引用</div>
+  <div class="cm-line HyperMD-hr" id="rule">---</div>
+  <div class="cm-line" id="after-rule">分隔线后的正文</div>
+  <div class="cm-line"><br></div>
+  <div class="cm-line" id="media"><span class="image-wrapper">图片占位</span></div>
+</div></div>
+<div class="markdown-source-view mod-cm6"><div class="cm-content">
+  <div class="cm-gap" style="height: 100px"></div>
+  <div class="cm-line" id="viewport-continuation">滚动后显示的段内续行</div>
+  <div class="cm-line"><br></div>
+  <div class="cm-line" id="viewport-paragraph">滚动区域中的新段落</div>
+</div></div>
+<div class="markdown-source-view mod-cm6"><div class="cm-content" id="dynamic">
+  <div class="cm-line">动态编辑的第一行</div>
+</div></div>
+<div class="markdown-source-view mod-cm6"><div class="cm-content"><div class="cm-line" id="wrapped"></div></div></div>
+<script>
+  window.paragraphTest = (async () => {
+    await document.fonts.ready;
+    let count = 0;
+    const assert = (condition, message) => { if (!condition) throw new Error(message); count += 1; };
+    const indent = (id, value) => assert(parseFloat(getComputedStyle(document.getElementById(id)).textIndent) === value, id + ': expected indent ' + value);
+    for (const id of ['first', 'next', 'after-heading', 'after-code', 'after-rule', 'viewport-paragraph']) indent(id, 36);
+    for (const id of ['soft', 'heading', 'code-open', 'code-body', 'code-end', 'list', 'quote', 'media', 'viewport-continuation']) indent(id, 0);
+    const offset = (child, parent) => document.getElementById(child).getBoundingClientRect().left - document.getElementById(parent).getBoundingClientRect().left;
+    assert(Math.abs(offset('read-first', 'read-paragraph') - offset('first-text', 'first')) < 1, 'First-line positions differ');
+    assert(Math.abs(offset('read-soft', 'read-paragraph') - offset('soft-text', 'soft')) < 1, 'Soft-line positions differ');
+    assert(Math.abs(offset('read-next-text', 'read-next') - offset('next-text', 'next')) < 1, 'New-paragraph positions differ');
+    const dynamic = document.getElementById('dynamic');
+    const line = document.createElement('div'); line.className = 'cm-line'; line.id = 'dynamic-next'; line.textContent = '一次回车后的续行';
+    dynamic.append(line); indent('dynamic-next', 0);
+    const blank = document.createElement('div'); blank.className = 'cm-line'; blank.append(document.createElement('br'));
+    dynamic.insertBefore(blank, line); indent('dynamic-next', 36);
+    blank.remove(); indent('dynamic-next', 0);
+    const wrapped = document.getElementById('wrapped');
+    wrapped.textContent = '这是一段用于检查自动换行的中文正文。'.repeat(8);
+    const glyph = index => { const range = document.createRange(); range.setStart(wrapped.firstChild, index); range.setEnd(wrapped.firstChild, index + 1); return range.getBoundingClientRect(); };
+    const first = glyph(0), left = wrapped.getBoundingClientRect().left;
+    assert(Math.abs(first.left - left - 36) < 1, 'Wrapped paragraph first line lost indentation');
+    const nextLine = Array.from({ length: wrapped.textContent.length }, (_, index) => glyph(index)).find(rect => rect.top > first.top + 1);
+    assert(nextLine && Math.abs(nextLine.left - left) < 1, 'Automatic wrapping must not repeat indentation');
+    const message = 'PASS ' + count + ' paragraph checks: single/double Enter structure, block boundaries, viewport gaps, joining and wrapping.';
+    document.getElementById('results').textContent = message;
+    document.documentElement.dataset.result = 'pass';
+    return message;
+  })().catch(error => {
+    document.getElementById('results').textContent = 'FAIL: ' + error.message;
+    document.documentElement.dataset.result = 'fail';
+    throw error;
+  });
+</script>
+</html>

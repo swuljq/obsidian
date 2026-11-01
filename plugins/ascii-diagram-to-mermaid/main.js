@@ -72,6 +72,15 @@ class AsciiDiagramToMermaidPlugin extends Plugin {
    * 同时扫描当前已存在的 SVG（处理插件加载时已打开的文件）。
    */
   _startMermaidDomWatcher() {
+    this._mermaidResizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const state = this._mermaidControls.get(entry.target);
+        if (!state || state.containerWidth === entry.contentRect.width) continue;
+        state.containerWidth = entry.contentRect.width;
+        this._applyMermaidScale(state);
+      }
+    });
+    this._mermaidObservers.push(this._mermaidResizeObserver);
     // 先处理已存在的
     this._processMermaidSvgs(document.body);
 
@@ -128,7 +137,6 @@ class AsciiDiagramToMermaidPlugin extends Plugin {
     if (state?.svg === svg && state.toolbar.parentElement === container) return;
     if (state && state.toolbar.parentElement === container) {
       state.svg = svg;
-      delete state.width;
       this._applyMermaidScale(state);
       return;
     }
@@ -163,6 +171,7 @@ class AsciiDiagramToMermaidPlugin extends Plugin {
     state = { svg, toolbar, buttons, percentage, scale: 100 };
     this._mermaidControls.set(container, state);
     this._applyMermaidScale(state);
+    this._mermaidResizeObserver.observe(container);
 
     this.registerDomEvent(toolbar, "click", (event) => {
       const button = event.target.closest("button[data-action]");
@@ -181,16 +190,16 @@ class AsciiDiagramToMermaidPlugin extends Plugin {
 
   _applyMermaidScale(state) {
     const { svg, scale } = state;
-    const width = svg.viewBox?.baseVal?.width || (state.width ||= svg.getBoundingClientRect().width);
-    // An explicit SVG width changes document flow, unlike transform: scale().
+    // Measure the default CSS-rendered size, not the SVG's internal coordinates.
+    // Reset and reapply synchronously so the browser never paints the intermediate size.
+    svg.classList.remove("adm-scaled-svg");
+    svg.style.removeProperty("--adm-svg-width");
+    svg.style.removeProperty("--adm-svg-scale");
+    const width = scale < 100 ? svg.getBoundingClientRect().width : 0;
     if (scale < 100 && width > 0) {
       svg.style.setProperty("--adm-svg-width", `${width}px`);
       svg.style.setProperty("--adm-svg-scale", String(scale / 100));
       svg.classList.add("adm-scaled-svg");
-    } else {
-      svg.classList.remove("adm-scaled-svg");
-      svg.style.removeProperty("--adm-svg-width");
-      svg.style.removeProperty("--adm-svg-scale");
     }
     state.percentage.textContent = `${scale}%`;
     state.buttons.smaller.disabled = scale <= 20;

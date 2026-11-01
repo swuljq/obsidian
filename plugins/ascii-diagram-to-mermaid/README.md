@@ -1,4 +1,6 @@
-# ASCII Diagram to Mermaid v1.2.0
+# ASCII Diagram to Mermaid v1.2.1
+
+v1.2.1 修复默认显示尺寸与 SVG `viewBox` 不一致时，从 100% 调至 90% 会突然大幅缩小的问题。现在以当前窗口下默认实际显示的宽度为统一基准，逐档等比例缩放，并在容器宽度变化时重新测量。
 
 在阅读视图的 `plain` / `text` / `txt` 代码块右上角点击“转 Mermaid”，直接调用 OpenAI 兼容 API，将当前 ASCII / Unicode 框图转换成 Mermaid 并原地替换代码块。不再依赖 OpenCode、Python 或外部命令行。
 

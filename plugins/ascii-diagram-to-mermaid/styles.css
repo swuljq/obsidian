@@ -157,5 +157,5 @@
 }
 
 .markdown-rendered :is(.block-language-mermaid, .mermaid) > svg.adm-scaled-svg {
-  width: calc(min(100%, var(--adm-svg-width)) * var(--adm-svg-scale)) !important;
+  width: calc(var(--adm-svg-width) * var(--adm-svg-scale)) !important;
 }

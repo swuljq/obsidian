@@ -20,7 +20,7 @@ test("Mermaid scale controls work in a real browser", async () => {
       svg { max-width: 1200px; } ${css}
       </style></head><body><main class="markdown-rendered">
       <div class="block-language-mermaid" id="first"><div class="mermaid" id="inner">
-      <svg viewBox="0 0 1200 960" width="100%" style="max-width:1200px" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="1180" height="940" fill="#eee9ff" stroke="#9673ff"/></svg>
+      <svg viewBox="0 0 500 440" width="100%" style="max-width:500px" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="480" height="420" fill="#eee9ff" stroke="#9673ff"/></svg>
       </div></div><p id="following">Following paragraph</p>
       <div class="mermaid" id="second"><svg viewBox="0 0 1200 960" width="100%" xmlns="http://www.w3.org/2000/svg"><rect width="1200" height="960" fill="#eee9ff"/></svg></div>
       </main></body></html>`);
@@ -74,7 +74,13 @@ test("Mermaid scale controls work in a real browser", async () => {
     const before = await diagram.boundingBox();
     const paragraphBefore = await page.locator("#following").boundingBox();
     await page.locator("#inner").hover();
-    for (let i = 0; i < 3; i++) await smaller.click();
+    for (let i = 1; i <= 3; i++) {
+      await smaller.click();
+      const step = await diagram.boundingBox();
+      assert.ok(Math.abs(step.width / before.width - (1 - i / 10)) < 0.01, `Step ${i}: scale must use the default rendered width, not the smaller viewBox`);
+      assert.ok(Math.abs(step.height / before.height - (1 - i / 10)) < 0.01, `Step ${i}: height must scale proportionally`);
+      console.log(`Scale ${100 - i * 10}%: ${before.width}px default width -> ${step.width}px`);
+    }
     const after = await diagram.boundingBox();
     const paragraphAfter = await page.locator("#following").boundingBox();
     assert.equal(await percent.textContent(), "70%");
@@ -92,9 +98,14 @@ test("Mermaid scale controls work in a real browser", async () => {
     await page.locator(".adm-fullscreen-modal").evaluate((el) => el.remove());
 
     await page.setViewportSize({ width: 390, height: 844 });
+    await page.waitForFunction(() => Math.abs(document.querySelector("#inner > svg").getBoundingClientRect().width - 390 * 0.7) < 1);
     const mobile = await diagram.boundingBox();
     assert.ok(Math.abs(mobile.width - 390 * 0.7) < 1, "Scaled diagram must adapt to narrow windows");
     assert.ok(await toolbar.evaluate((el) => el.getBoundingClientRect().right <= innerWidth));
+    await page.setViewportSize({ width: 1280, height: 1000 });
+    await page.waitForFunction(() => Math.abs(document.querySelector("#inner > svg").getBoundingClientRect().width - 700) < 1);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.waitForFunction(() => Math.abs(document.querySelector("#inner > svg").getBoundingClientRect().width - 390 * 0.7) < 1);
     for (let i = 0; i < 5; i++) await smaller.click();
     assert.equal(await percent.textContent(), "20%");
     assert.equal(await smaller.isDisabled(), true);
@@ -119,10 +130,13 @@ test("Mermaid scale controls work in a real browser", async () => {
       fresh.setAttribute("viewBox", "0 0 800 640");
       old.replaceWith(fresh);
     });
-    await page.waitForFunction(() => document.querySelector("#inner > svg").style.getPropertyValue("--adm-svg-width") === "800px");
+    await page.waitForFunction(() => document.querySelector("#inner > svg").classList.contains("adm-scaled-svg"));
     assert.equal(await toolbar.count(), 1);
     assert.equal(await percent.textContent(), "90%");
+    const replacementScaled = await diagram.boundingBox();
     await reset.click();
+    const replacementDefault = await diagram.boundingBox();
+    assert.ok(Math.abs(replacementScaled.width / replacementDefault.width - 0.9) < 0.01);
 
     await smaller.click();
     await page.evaluate(() => {

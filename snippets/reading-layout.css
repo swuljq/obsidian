@@ -71,12 +71,6 @@
         padding-bottom: var(--reading-paper-padding-y) !important;
     }
 
-    /* Keep the paper margin, not Obsidian's extra half-screen scroll tail. */
-    .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer > .cm-content,
-    .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer > .cm-contentContainer > .cm-content {
-        padding-bottom: 0 !important;
-    }
-
     /* Obsidian caps both containers AND individual .cm-line elements at 700px. */
     .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer > .cm-contentContainer,
     .markdown-source-view.mod-cm6 > .cm-editor > .cm-scroller > .cm-sizer > .cm-content,

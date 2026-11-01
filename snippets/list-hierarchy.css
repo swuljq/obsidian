@@ -1,13 +1,13 @@
 /*
  * Obsidian List Hierarchy
  *
- * 阅读模式：有序列表显示 1. / 1.1. / 1.1.1. 层级编号。
+ * 阅读模式：各层保留普通数字编号，靠缩进区分层级。
  * 编辑模式：保留原生编号，避免虚拟滚动导致 CSS 计数失真。
- * 编号字体：Cascadia Code；正文字体：继承 typography.css。
+ * 编号与正文使用相同字体，普通字重、中灰色，无层级竖线。
  */
 
 body {
-    --hierarchy-list-indent: 3em;
+    --hierarchy-list-indent: 2em;
     --hierarchy-item-spacing: 0.18em;
     --hierarchy-line-height: 1.65;
 }
@@ -20,7 +20,7 @@ body {
     --indentation-guide-color-active: transparent;
 }
 
-/* 阅读模式：普通有序列表使用原生 list-item 计数生成层级编号。 */
+/* 阅读模式：保留原生编号与换行对齐，仅调整外观和缩进。 */
 .markdown-rendered ol {
     list-style-type: decimal;
     list-style-position: outside;
@@ -35,38 +35,19 @@ body {
 }
 
 .markdown-rendered ol > li::marker {
-    content: counters(list-item, ".") ". ";
-    font-family:
-        "Cascadia Code Local",
-        "Cascadia Code",
-        Consolas,
-        monospace;
-    font-size: 1em;
-    font-weight: 600;
-    color: var(--text-muted);
-}
-
-/* Match top-level lists even when Obsidian inserts rendering wrappers. */
-.markdown-rendered ol:not(ol ol, ul ol) > li::marker {
-    color: var(--text-normal);
-    font-weight: 700;
-}
-
-/* Native markers preserve special numbering and avoid counting unordered parents. */
-.markdown-rendered :is(ol[start], ol[reversed], ol:has(> li[value])) > li::marker,
-.markdown-rendered :is(ul, ol[start], ol[reversed], ol:has(> li[value])) ol > li::marker {
     content: normal;
+    font-family: inherit;
+    font-size: 1em;
+    font-weight: 400;
+    color: var(--text-muted);
 }
 
 /* 编辑模式：不隐藏源编号，不设置计数器、水平缩进或固定字号。 */
 .markdown-source-view.mod-cm6.is-live-preview .cm-formatting-list-ol {
-    font-family:
-        "Cascadia Code Local",
-        "Cascadia Code",
-        Consolas,
-        monospace;
+    font-family: inherit;
     font-size: inherit;
-    font-weight: 600;
+    font-weight: 400;
+    color: var(--text-muted);
 }
 
 .markdown-source-view.mod-cm6.is-live-preview .cm-line.HyperMD-list-line {

@@ -55,8 +55,19 @@
         box-shadow: 0 0 0 1px var(--reading-paper-edge);
     }
 
-    /* Reading mode writes half a viewport of bottom padding inline at runtime. */
+    /* A viewport-sized grid track survives the renderer's inline min-height. */
+    .markdown-reading-view > .markdown-preview-view {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: minmax(min-content, auto);
+        align-content: stretch;
+    }
+
+    /* Preserve the native full-document minimum used by virtualized sections. */
     .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer {
+        grid-column: 1;
+        grid-row: 1;
+        align-self: stretch;
         padding-bottom: var(--reading-paper-padding-y) !important;
     }
 

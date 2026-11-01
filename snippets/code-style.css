@@ -127,7 +127,7 @@ body {
    06. Live Preview：代码块每一行
    ============================================================ */
 
-.markdown-source-view.mod-cm6
+.markdown-source-view.mod-cm6.is-live-preview
 .cm-line.HyperMD-codeblock {
 
     font-family:
@@ -153,14 +153,9 @@ body {
         1px solid
         var(--custom-code-border);
 
-    padding-left:
-        var(--custom-code-padding-x) !important;
-
-    padding-right:
-        var(--custom-code-padding-x) !important;
-
-    text-indent:
-        0 !important;
+    /* Keep native horizontal padding and hanging indents for nested fences. */
+    text-align:
+        left !important;
 }
 
 
@@ -168,7 +163,7 @@ body {
    07. Live Preview：第一行
    ============================================================ */
 
-.markdown-source-view.mod-cm6
+.markdown-source-view.mod-cm6.is-live-preview
 .cm-line.HyperMD-codeblock-begin {
 
     padding-top:
@@ -190,7 +185,7 @@ body {
    08. Live Preview：最后一行
    ============================================================ */
 
-.markdown-source-view.mod-cm6
+.markdown-source-view.mod-cm6.is-live-preview
 .cm-line.HyperMD-codeblock-end {
 
     padding-bottom:
@@ -209,22 +204,7 @@ body {
 
 
 /* ============================================================
-   09. 代码块不要继承正文首行缩进
-   ============================================================ */
-
-.markdown-source-view.mod-cm6
-.cm-line.HyperMD-codeblock {
-
-    text-indent:
-        0 !important;
-
-    text-align:
-        left !important;
-}
-
-
-/* ============================================================
-   10. 阅读视图滚动条
+   09. 阅读视图滚动条
    ============================================================ */
 
 .markdown-rendered pre::-webkit-scrollbar {
@@ -257,7 +237,7 @@ body {
         var(--text-muted);
 }
 /* ============================================================
-   11. 代码块语言标签
+   10. 代码块语言标签
    ============================================================ */
 
 /* 给带语言的代码块留一点顶部空间 */
@@ -300,110 +280,7 @@ body {
 
 
 /* ============================================================
-   12. 常用语言名称
-   ============================================================ */
-
-.markdown-rendered pre.language-cpp {
-    --code-lang-label: "C++";
-}
-
-.markdown-rendered pre.language-c {
-    --code-lang-label: "C";
-}
-
-.markdown-rendered pre.language-python {
-    --code-lang-label: "Python";
-}
-
-.markdown-rendered pre.language-py {
-    --code-lang-label: "Python";
-}
-
-.markdown-rendered pre.language-verilog {
-    --code-lang-label: "Verilog";
-}
-
-.markdown-rendered pre.language-systemverilog {
-    --code-lang-label: "SystemVerilog";
-}
-
-.markdown-rendered pre.language-sv {
-    --code-lang-label: "SystemVerilog";
-}
-
-.markdown-rendered pre.language-vhdl {
-    --code-lang-label: "VHDL";
-}
-
-.markdown-rendered pre.language-bash {
-    --code-lang-label: "Bash";
-}
-
-.markdown-rendered pre.language-shell {
-    --code-lang-label: "Shell";
-}
-
-.markdown-rendered pre.language-sh {
-    --code-lang-label: "Shell";
-}
-
-.markdown-rendered pre.language-json {
-    --code-lang-label: "JSON";
-}
-
-.markdown-rendered pre.language-yaml {
-    --code-lang-label: "YAML";
-}
-
-.markdown-rendered pre.language-javascript {
-    --code-lang-label: "JavaScript";
-}
-
-.markdown-rendered pre.language-js {
-    --code-lang-label: "JavaScript";
-}
-
-.markdown-rendered pre.language-typescript {
-    --code-lang-label: "TypeScript";
-}
-
-.markdown-rendered pre.language-ts {
-    --code-lang-label: "TypeScript";
-}
-
-.markdown-rendered pre.language-java {
-    --code-lang-label: "Java";
-}
-
-.markdown-rendered pre.language-sql {
-    --code-lang-label: "SQL";
-}
-
-.markdown-rendered pre.language-html {
-    --code-lang-label: "HTML";
-}
-
-.markdown-rendered pre.language-css {
-    --code-lang-label: "CSS";
-}
-
-.markdown-rendered pre.language-matlab {
-    --code-lang-label: "MATLAB";
-}
-
-.markdown-rendered pre.language-cmake {
-    --code-lang-label: "CMake";
-}
-
-.markdown-rendered pre.language-plain,
-.markdown-rendered pre.language-Plain,
-.markdown-rendered pre.language-plaintext,
-.markdown-rendered pre.language-text,
-.markdown-rendered pre.language-txt {
-    --code-lang-label: "PLAIN TEXT";
-}
-/* ============================================================
-   Code Title Fence：标题与代码块无缝连接
+   11. Code Title Fence：标题与代码块无缝连接
    ============================================================ */
 
 .markdown-rendered .ctf-code-block {
@@ -411,16 +288,7 @@ body {
 }
 
 
-/* 标题下方的代码块取消自身外边距 */
-.markdown-rendered .ctf-code-block > pre {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-
-    border-top-left-radius: 0 !important;
-    border-top-right-radius: 0 !important;
-}
-
-
+/* The plugin owns .ctf-code-body > pre margins and title/body joins. */
 /* 标题底部不要圆角 */
 .markdown-rendered .ctf-code-block > .ctf-code-title {
     margin-bottom: 0 !important;
@@ -429,7 +297,7 @@ body {
     border-bottom-right-radius: 0 !important;
 }
 /* ============================================================
-   代码块语言标签映射
+   12. 代码块语言标签映射
    ============================================================ */
 
 
@@ -875,7 +743,7 @@ body {
     --code-lang-label: "PLAIN TEXT";
 }
 /* ============================================================
-   代码缩进 / 格式保持
+   13. 代码缩进 / 格式保持
    ============================================================ */
 
 /* 阅读视图 */
@@ -892,11 +760,10 @@ body {
 
 
 /* Live Preview 编辑视图 */
-.markdown-source-view.mod-cm6
+.markdown-source-view.mod-cm6.is-live-preview
 .cm-line.HyperMD-codeblock {
 
-    tab-size: 4 !important;
-    -moz-tab-size: 4 !important;
+    /* Tab width is inherited from CodeMirror's editor configuration. */
 
     white-space: pre !important;
 
